@@ -1,12 +1,13 @@
-package com.uoko.rpc.framework;
+package com.uoko.rpc.framework.transfer;
 
 import java.io.Serializable;
 
-public class RPCTransferBean implements Serializable {
+public class PRCMethod implements Serializable {
 	private static final long serialVersionUID = 1510326612440404416L;
 	private String methodName;
 	private Class<?>[] parameterTypes;
 	private Object[] parameters;
+	private Object result;
 	
 	public String getMethodName() {
 		return methodName;
@@ -25,5 +26,11 @@ public class RPCTransferBean implements Serializable {
 	}
 	public void setParameters(Object[] parameters) {
 		this.parameters = parameters;
+	}
+	public Object getResult() {
+		return result;
+	}
+	public void setResult(Object result) {
+		this.result = result;
 	}
 }
