@@ -14,11 +14,11 @@ import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCClientProxy {
 	/*
-	 * ·þÎñÒýÓÃ
-	 * @param <T> ½Ó¿Ú·ºÐÍ 
-	 * @param interfaceClass ½Ó¿ÚÀàÐÍ 
-	 * @param port ·þÎñÆ÷¶Ë¿Ú 
-	 * @return Ô¶³Ì·þÎñ 
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param <T> ï¿½Ó¿Ú·ï¿½ï¿½ï¿½ 
+	 * @param interfaceClass ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½ 
+	 * @param port ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¿ï¿½ 
+	 * @return Ô¶ï¿½Ì·ï¿½ï¿½ï¿½ 
 	 * @throws Exception 
 	 * 
 	 */
@@ -52,6 +52,13 @@ public class RPCClientProxy {
 				RPCClient client = new RPCClient(host,port);
 				client.Invoke(
 						new SimpleChannelHandler(){
+
+							@Override
+							public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
+								super.channelConnected(ctx, e);
+								e.getChannel().write(rpcMethod);
+							}
+							
 							@Override
 							public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
 								if(e.getMessage() instanceof PRCMethod)
@@ -59,12 +66,7 @@ public class RPCClientProxy {
 									rpcMethod = (PRCMethod)e.getMessage();
 									super.messageReceived(ctx, e);
 								}
-							}
-							
-							@Override
-							public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
-								super.channelConnected(ctx, e);
-								e.getChannel().write(rpcMethod);
+								e.getChannel().close();
 							}
 				});
 				

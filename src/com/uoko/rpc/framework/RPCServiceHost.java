@@ -10,9 +10,9 @@ import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCServiceHost {
 	/*
-	 * ±©Â¶·þÎñ
-	 * @param service ·þÎñÊµÏÖ 
-	 * @param port ·þÎñ¶Ë¿Ú
+	 * ï¿½ï¿½Â¶ï¿½ï¿½ï¿½ï¿½
+	 * @param service ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ 
+	 * @param port ï¿½ï¿½ï¿½ï¿½Ë¿ï¿½
 	 * @throws Exception
 	 * 
 	 */
@@ -36,14 +36,6 @@ public class RPCServiceHost {
 					e.getChannel().write(rpcMethod);
 				}
 				super.messageReceived(ctx, e);
-			}
- 
-		},
-				new SimpleChannelHandler(){
-			@Override
-			public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-				super.messageReceived(ctx, e);
-				e.getChannel().close();
 			}
  
 		});

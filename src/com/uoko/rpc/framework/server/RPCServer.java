@@ -21,7 +21,7 @@ public class RPCServer {
 	String host;
 	int port;
 	
-	public RPCServer(int port,SimpleChannelHandler invokeHandler,SimpleChannelHandler endInvokeHandler){
+	public RPCServer(int port,SimpleChannelHandler invokeHandler){
 		
 		this.port = port;
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory(){
@@ -33,8 +33,7 @@ public class RPCServer {
 						new ObjectDecoder(ClassResolvers.cacheDisabled(this
 				                .getClass().getClassLoader())), 
 						new ObjectEncoder(),
-						invokeHandler,
-						endInvokeHandler
+						invokeHandler
 						);
 			}
 
