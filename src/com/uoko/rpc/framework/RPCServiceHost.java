@@ -9,13 +9,6 @@ import com.uoko.rpc.framework.server.RPCServer;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCServiceHost {
-	/*
-	 * ��¶����
-	 * @param service ����ʵ�� 
-	 * @param port ����˿�
-	 * @throws Exception
-	 * 
-	 */
 	public static void export(final Object service,int port) throws Exception{
 		if(service == null){
 			throw new IllegalArgumentException("service instance == null");

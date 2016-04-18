@@ -13,15 +13,6 @@ import com.uoko.rpc.framework.client.RPCClient;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCClientProxy {
-	/*
-	 * ��������
-	 * @param <T> �ӿڷ��� 
-	 * @param interfaceClass �ӿ����� 
-	 * @param port �������˿� 
-	 * @return Զ�̷��� 
-	 * @throws Exception 
-	 * 
-	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T refer(final Class<T> interfaceClass, final String host, final int port) throws Exception{
 		if (interfaceClass == null){
