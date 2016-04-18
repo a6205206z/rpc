@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -13,20 +14,26 @@ import com.uoko.rpc.framework.client.RPCClient;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCClientProxy {
+	private static final Logger logger = Logger.getLogger(RPCClientProxy.class); 
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T refer(final Class<T> interfaceClass, final String host, final int port) throws Exception{
 		if (interfaceClass == null){
+			logger.error("interface class == null");
 			throw new IllegalArgumentException("interface class == null");
 		}
 		if (! interfaceClass.isInterface()){
+			logger.error("The " + interfaceClass.getName() + " must be interface class!");
 			throw new IllegalArgumentException("The " + interfaceClass.getName() + " must be interface class!");  
 		}
 		
 		if (host == null || host.length() == 0){
+			logger.error("Host == null");
 			throw new IllegalArgumentException("Host == null");
 		}
 		
 		if (port <= 0 || port > 65535){
+			logger.error("Invalid port " + port);
 			throw new IllegalArgumentException("Invalid port " + port);
 		}
 		

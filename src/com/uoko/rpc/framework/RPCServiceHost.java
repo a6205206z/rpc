@@ -1,6 +1,8 @@
 package com.uoko.rpc.framework;
 
 import java.lang.reflect.Method;
+
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -9,11 +11,15 @@ import com.uoko.rpc.framework.server.RPCServer;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCServiceHost {
+	private static final Logger logger = Logger.getLogger(RPCServiceHost.class); 
+	
 	public static void export(final Object service,int port) throws Exception{
 		if(service == null){
+			logger.error("service instance == null");
 			throw new IllegalArgumentException("service instance == null");
 		}
 		if(port <= 0 || port > 65535){
+			logger.error("Invalid port");
 			throw new IllegalArgumentException("Invalid port");
 		}
 		
@@ -34,7 +40,6 @@ public class RPCServiceHost {
 		});
 		
 		Channel bind = server.Start();
-		System.out.println("Export service " + service.getClass().getName() + "on " + bind.getLocalAddress());
-		
+		logger.info("Export service " + service.getClass().getName() + "on " + bind.getLocalAddress());
 	}
 }
