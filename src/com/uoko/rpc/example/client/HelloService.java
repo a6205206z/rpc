@@ -1,4 +1,4 @@
-package com.uoko.rpc.services;
+package com.uoko.rpc.example.client;
 
 public interface HelloService {
 	String hello(String name);

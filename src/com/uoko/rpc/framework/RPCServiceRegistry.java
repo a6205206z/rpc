@@ -12,8 +12,8 @@ import org.apache.zookeeper.ZooKeeper;
 
 public class RPCServiceRegistry {
 	private static final Logger logger = Logger.getLogger(RPCServiceRegistry.class); 
-	
 	private CountDownLatch latch = new CountDownLatch(1);
+	
 	private String connectionString;
 	private String registerPath;
 	private int sessionTimeout;
@@ -31,12 +31,12 @@ public class RPCServiceRegistry {
 		
 		
 		String zkData = String.format("service name:%s\n",service.getClass().getName());
-		zkData = String.format("address:%s\n",address);
+		zkData += String.format("address:%s\n",address);
 		
 		Method[] methods = service.getClass().getMethods();
 		if(methods != null){
-			for(int i=0; i<methods.length;++i){
-				String.format("method: %s\n",methods[i].getName());
+			for(Method method:methods){
+				zkData += String.format("method: %s\n",method.getName());
 			}
 		}
 		

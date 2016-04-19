@@ -1,4 +1,4 @@
-package com.uoko.rpc.services;
+package com.uoko.rpc.example.services;
 
 public class HelloServiceImpl implements HelloService {
 

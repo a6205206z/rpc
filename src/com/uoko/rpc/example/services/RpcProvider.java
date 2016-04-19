@@ -1,4 +1,4 @@
-package com.uoko.rpc.services;
+package com.uoko.rpc.example.services;
 import com.uoko.rpc.framework.RPCServiceHost;
 import com.uoko.rpc.framework.RPCServiceRegistry;
 
