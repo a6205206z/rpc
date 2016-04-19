@@ -37,16 +37,34 @@ import com.uoko.rpc.framework.RPCServiceRegistry;
 
 public class RpcProvider {
 	public static void main(String[] args) throws Exception{
+		//step 1.  create service
 		HelloService service = new HelloServiceImpl();
 		
-		//registry service
-		RPCServiceRegistry serviceRegistry = new RPCServiceRegistry("127.0.0.1:2181", "/services/HelloService", 10000); 
+		//step 2. create service registry
+		RPCServiceRegistry serviceRegistry = RPCServiceRegistry.Create();
+		
+		//step 3. register service
 		serviceRegistry.Register(service, "192.168.99.1:8080");
 		
-		//start host
+		//step 4. export service
 		RPCServiceHost.export(service, 8080);
 	}
 }
+```
+
+###server.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns="http://www.springframework.org/schema/beans"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">  
+    <bean id="serviceRegistry" class="com.uoko.rpc.framework.RPCServiceRegistry">  
+        <constructor-arg value="127.0.0.1:2181"/>
+        <constructor-arg value="/services/HelloService"/>
+        <constructor-arg value="10000"/>
+    </bean>  
+</beans>  
 ```
 
 ##客户端演示
