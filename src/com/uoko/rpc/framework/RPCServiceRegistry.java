@@ -9,19 +9,37 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.uoko.rpc.framework.annotations.RPCMethod;
 
 public class RPCServiceRegistry {
 	private static final Logger logger = Logger.getLogger(RPCServiceRegistry.class); 
 	private CountDownLatch latch = new CountDownLatch(1);
+	private static ApplicationContext ctx = new ClassPathXmlApplicationContext("server.xml");
 	
 	private String connectionString;
 	private String registerPath;
 	private int sessionTimeout;
 	
-	public RPCServiceRegistry(String zkConnectionString,String serviceRegisterPath,int zkSessionTimeout){
+	
+	
+	private RPCServiceRegistry(String zkConnectionString,String serviceRegisterPath,int zkSessionTimeout){
 		this.connectionString = zkConnectionString;
 		this.sessionTimeout = zkSessionTimeout;
 		this.registerPath = serviceRegisterPath;
+	}
+	
+	public static RPCServiceRegistry Create(){
+		RPCServiceRegistry serviceRegistry = null;
+		try{
+			serviceRegistry = (RPCServiceRegistry)ctx.getBean("serviceRegistry");
+		}
+		catch(Exception e){
+			logger.error(e);
+		}
+		return serviceRegistry;
 	}
 	
 	public void Register(final Object service,String address){
@@ -36,7 +54,9 @@ public class RPCServiceRegistry {
 		Method[] methods = service.getClass().getMethods();
 		if(methods != null){
 			for(Method method:methods){
-				zkData += String.format("method: %s\n",method.getName());
+				if(method.getAnnotation(RPCMethod.class) != null){
+					zkData += String.format("method: %s\n",method.getName());
+				}
 			}
 		}
 		
@@ -45,7 +65,6 @@ public class RPCServiceRegistry {
 			createNode(zk,zkData);
 		}
 	}
-	
 	
 	private ZooKeeper zkConnect(){
 		ZooKeeper zk = null;
