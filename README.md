@@ -7,16 +7,16 @@
 
 ##服务端演示
 ###HelloService.java
-'''java
+```java
 package com.uoko.rpc.example.services;
 
 public interface HelloService {
 	String hello(String name);
 }
-'''
+```
 
 ###HelloServiceImpl.java
-'''java
+```java
 package com.uoko.rpc.example.services;
 
 public class HelloServiceImpl implements HelloService {
@@ -27,10 +27,10 @@ public class HelloServiceImpl implements HelloService {
 	}
 	
 }
-'''
+```
 
 ###RpcProvider.java
-'''java
+```java
 package com.uoko.rpc.example.services;
 import com.uoko.rpc.framework.RPCServiceHost;
 import com.uoko.rpc.framework.RPCServiceRegistry;
@@ -47,20 +47,20 @@ public class RpcProvider {
 		RPCServiceHost.export(service, 8080);
 	}
 }
-'''
+```
 
 ##客户端演示
 ###HelloService.java
-'''java
+```java
 package com.uoko.rpc.example.client;
 
 public interface HelloService {
 	String hello(String name);
 }
-'''
+```
 
 ###RpcConsumer.java
-'''java
+```java
 package com.uoko.rpc.example.client;
 
 
@@ -82,4 +82,4 @@ public class RpcConsumer {
 	}
 }
 
-'''
+```
