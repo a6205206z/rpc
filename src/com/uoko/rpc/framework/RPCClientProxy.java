@@ -1,3 +1,9 @@
+/*
+ * {@code RPCClientProxy} is the Proxy of Rpc Client
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.framework;
 
 import java.lang.reflect.InvocationHandler;

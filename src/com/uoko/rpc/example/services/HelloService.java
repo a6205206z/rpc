@@ -1,3 +1,10 @@
+/*
+ * {@code HelloService}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.example.services;
 
 import com.uoko.rpc.framework.annotations.RPCMethod;

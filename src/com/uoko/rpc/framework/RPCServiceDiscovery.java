@@ -1,3 +1,9 @@
+/*
+ * {@code RPCServiceDiscovery} is a discovery service use on ZooKeeper
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.framework;
 
 import java.util.ArrayList;

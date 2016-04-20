@@ -1,3 +1,10 @@
+/*
+ * {@code RpcConsumer}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.example.client;
 
 

@@ -1,3 +1,11 @@
+/*
+ * {@code RPCServiceHost}
+ * 
+ * the host of service 
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.framework;
 
 import java.lang.reflect.Method;
