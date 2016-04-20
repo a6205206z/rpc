@@ -10,34 +10,36 @@
 ```java
 package com.uoko.rpc.example.services;
 
+import com.uoko.rpc.framework.annotations.RPCMethod;
+import com.uoko.rpc.framework.annotations.RPCService;
+
+@RPCService(name = "HelloService", type = HelloService.class)
 public interface HelloService {
+	@RPCMethod(name="hello")
 	String hello(String name);
 }
+
 ```
 
 ###HelloServiceImpl.java
 ```java
 package com.uoko.rpc.example.services;
 
-import com.uoko.rpc.framework.annotations.RPCMethod;
-import com.uoko.rpc.framework.annotations.RPCService;
-
-@RPCService(name = "HelloService", type = HelloService.class)
 public class HelloServiceImpl implements HelloService {
-
 	@Override
-	@RPCMethod(name="hello")
 	public String hello(String name) {
 		return "Hello " + name;
 	}
 	
 }
 
+
 ```
 
 ###RpcProvider.java
 ```java
 package com.uoko.rpc.example.services;
+
 import com.uoko.rpc.framework.RPCServiceHost;
 import com.uoko.rpc.framework.RPCServiceRegistry;
 
@@ -50,12 +52,13 @@ public class RpcProvider {
 		RPCServiceRegistry serviceRegistry = RPCServiceRegistry.Create();
 		
 		//step 3. register service
-		serviceRegistry.Register(service, "192.168.99.1:8080");
+		serviceRegistry.Register(HelloService.class,"1.0", "192.168.99.1:8080");
 		
 		//step 4. export service
 		RPCServiceHost.export(service, 8080);
 	}
 }
+
 ```
 
 ###server.xml
