@@ -49,13 +49,7 @@ public class RpcProvider {
 		//step 1.  create service
 		HelloService service = new HelloServiceImpl();
 		
-		//step 2. create service registry
-		RPCServiceRegistry serviceRegistry = RPCServiceRegistry.Create();
-		
-		//step 3. register service
-		serviceRegistry.Register(HelloService.class,"1.0", "192.168.99.1:8080");
-		
-		//step 4. export service
+		//step 2. export service
 		RPCServiceHost.export(service, 8080);
 	}
 }
