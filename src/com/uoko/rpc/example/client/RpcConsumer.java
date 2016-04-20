@@ -13,7 +13,7 @@ public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
 		//invoke
-		HelloService service = RPCClientProxy.refer(HelloService.class, "127.0.0.1", 8080);
+		HelloService service = RPCClientProxy.refer(HelloService.class, "127.0.0.1", 8090);
 		String result = service.hello("Cean");
 		System.out.println(result);
 		

@@ -1,5 +1,10 @@
 package com.uoko.rpc.example.services;
 
+import com.uoko.rpc.framework.annotations.RPCMethod;
+import com.uoko.rpc.framework.annotations.RPCService;
+
+@RPCService(name = "HelloService", type = HelloService.class)
 public interface HelloService {
+	@RPCMethod(name="hello")
 	String hello(String name);
 }

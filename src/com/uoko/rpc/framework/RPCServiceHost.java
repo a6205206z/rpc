@@ -7,13 +7,15 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+
+import com.uoko.rpc.example.services.HelloService;
 import com.uoko.rpc.framework.server.RPCServer;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCServiceHost {
 	private static final Logger logger = Logger.getLogger(RPCServiceHost.class); 
 	
-	public static void export(final Object service,int port) throws Exception{
+	public static void export(final Object service,String version,String ip,int port) throws Exception{
 		if(service == null){
 			logger.error("service instance == null");
 			throw new IllegalArgumentException("service instance == null");
@@ -23,6 +25,11 @@ public class RPCServiceHost {
 			throw new IllegalArgumentException("Invalid port");
 		}
 		
+		/*
+		 * 
+		 * start service 
+		 * 
+		 * */
 		RPCServer server = new RPCServer(port,
 				new SimpleChannelHandler(){
 			@Override
@@ -41,5 +48,15 @@ public class RPCServiceHost {
 		
 		Channel bind = server.Start();
 		logger.info("Export service " + service.getClass().getName() + "on " + bind.getLocalAddress());
+		
+		
+		/*
+		 * 
+		 * register service
+		 * 
+		 * */
+		RPCServiceRegistry serviceRegistry = RPCServiceRegistry.Create();
+		serviceRegistry.Register(HelloService.class,version, String.format("%s:%d",ip,port));
+		logger.info("Register service " + service.getClass().getName() + "on zookeeper");
 	}
 }

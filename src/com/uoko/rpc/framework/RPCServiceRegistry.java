@@ -20,15 +20,15 @@ public class RPCServiceRegistry {
 	private static ApplicationContext ctx = new ClassPathXmlApplicationContext("server.xml");
 	
 	private String connectionString;
-	private String registerPath;
+	private String rootPath;
 	private int sessionTimeout;
 	
 	
 	
-	private RPCServiceRegistry(String zkConnectionString,String serviceRegisterPath,int zkSessionTimeout){
+	private RPCServiceRegistry(String zkConnectionString,String zkRootPath,int zkSessionTimeout){
 		this.connectionString = zkConnectionString;
 		this.sessionTimeout = zkSessionTimeout;
-		this.registerPath = serviceRegisterPath;
+		this.rootPath = zkRootPath;
 	}
 	
 	public static RPCServiceRegistry Create(){
@@ -42,27 +42,21 @@ public class RPCServiceRegistry {
 		return serviceRegistry;
 	}
 	
-	public void Register(final Object service,String address){
-		if(service == null){
-			throw new IllegalArgumentException("service instance == null");
-		}
+	public <T> void Register(final Class<T> interfaceClass,String version,String serviceAddress){
+		String methodsInfo = "";
 		
-		
-		String zkData = String.format("service name:%s\n",service.getClass().getName());
-		zkData += String.format("address:%s\n",address);
-		
-		Method[] methods = service.getClass().getMethods();
+		Method[] methods = interfaceClass.getMethods();
 		if(methods != null){
 			for(Method method:methods){
 				if(method.getAnnotation(RPCMethod.class) != null){
-					zkData += String.format("method: %s\n",method.getName());
+					methodsInfo += String.format("method: %s\n",method.getName());
 				}
 			}
 		}
 		
 		ZooKeeper zk = zkConnect();
 		if(zk != null){
-			createNode(zk,zkData);
+			createNode(zk,interfaceClass.getSimpleName(),version,serviceAddress,methodsInfo);
 		}
 	}
 	
@@ -86,12 +80,35 @@ public class RPCServiceRegistry {
 		return zk;
 	}
 	
-	private void createNode(ZooKeeper zk,String data){
+	/**
+    create node in ZooKeeper
+    
+	 **/
+	private void createNode(ZooKeeper zk, String serviceName, String version, String serviceAddress,String serviceInfo){
 		try {
-			byte[] buffer = data.getBytes();
-			String result = zk.create(registerPath, buffer, 
+			if(zk.exists(rootPath, false) == null){
+				zk.create(rootPath, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
+			
+			/*
+			 * This code needs to be optimized
+			 * 
+			 * */
+			String servicePath = rootPath + "/" + serviceName;
+			if(zk.exists(servicePath, false) == null){
+				zk.create(servicePath, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
+			
+			servicePath += "/" + version;
+			if(zk.exists(servicePath, false) == null){
+				zk.create(servicePath, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
+			
+			servicePath += "/" + serviceAddress;
+			byte[] buffer = serviceInfo.getBytes();
+			String result = zk.create(servicePath, buffer, 
 					ZooDefs.Ids.OPEN_ACL_UNSAFE, 
-					CreateMode.EPHEMERAL_SEQUENTIAL);
+					CreateMode.EPHEMERAL);
 			
 			logger.info("create zookeeper node : " + result);
 		} catch (Exception e) {
