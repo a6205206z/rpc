@@ -6,7 +6,6 @@
  * */
 package com.uoko.rpc.framework;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -15,7 +14,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-public class RPCServiceDiscovery {
+public class RPCServiceDiscovery<T> {
 	private static final Logger logger = Logger.getLogger(RPCServiceDiscovery.class);
 	private CountDownLatch latch = new CountDownLatch(1);
 	
@@ -23,14 +22,17 @@ public class RPCServiceDiscovery {
 	private String rootPath;
 	private int sessionTimeout;
 	private RPCServiceDiscoveryHandler serviceDiscoveryHandler;
+	private String serviceAddressZKPath;
 	
 	
-	public RPCServiceDiscovery(String zkConnectionString,String registerRootPath,
+	public RPCServiceDiscovery(final Class<T> interfaceClass,String version,String zkConnectionString,String registerRootPath,
 			int zkSessionTimeout,RPCServiceDiscoveryHandler discoveryHandler){
+		
 		this.connectionString = zkConnectionString;
 		this.rootPath = registerRootPath;
 		this.sessionTimeout = zkSessionTimeout;
 		this.serviceDiscoveryHandler = discoveryHandler;
+		this.serviceAddressZKPath = rootPath + "/" + interfaceClass.getSimpleName() + "/" + version;
 	}
 	
 	public void Init(){
@@ -63,8 +65,7 @@ public class RPCServiceDiscovery {
 	
 	private void WatchNode(ZooKeeper zk){
 		try {
-			List<String> serviceInfos = new ArrayList<String>();
-			List<String> nodeList = zk.getChildren(rootPath, new Watcher(){
+			List<String> addressList = zk.getChildren(this.serviceAddressZKPath, new Watcher(){
 				@Override
 				public void process(WatchedEvent event) {
 					if(event.getType() == Event.EventType.NodeChildrenChanged){
@@ -72,15 +73,9 @@ public class RPCServiceDiscovery {
 					}
 				}
 			});
-			
-			for(String node:nodeList){
-				byte[] buffer = zk.getData(rootPath + "/" +node, false, null);
-				String data = new String(buffer);
-				serviceInfos.add(data);
-			}
-			
+
 			if(this.serviceDiscoveryHandler != null){
-				this.serviceDiscoveryHandler.serviceChanged(serviceInfos);
+				this.serviceDiscoveryHandler.serviceChanged(addressList);
 			}
 			
 		} catch (Exception e) {
