@@ -86,22 +86,24 @@ public interface HelloService {
 package com.uoko.rpc.example.client;
 
 
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
 import com.uoko.rpc.example.services.HelloService;
 import com.uoko.rpc.framework.RPCClientProxy;
-import com.uoko.rpc.framework.RPCServiceDiscovery;
-import com.uoko.rpc.framework.RPCServiceDiscoveryHandler;
 
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
 		//invoke
-		HelloService service = RPCClientProxy.refer(HelloService.class, "127.0.0.1", 8080);
-		String result = service.hello("Cean");
-		System.out.println(result);
+		/*
+		*@parameters service class type , version, zk address,zk root path, zk timeout
+		*/
+		RPCClientProxy<HelloService> proxy = new RPCClientProxy<HelloService>(HelloService.class, "1.0", "127.0.0.1:2181", "/services", 10000);
+		HelloService service = proxy.refer();
+		for(int i = 0;i < 100; ++i){
+			String result = service.hello("Cean");
+			System.out.println(result);
+		}
 	}
 }
+
 
 ```
