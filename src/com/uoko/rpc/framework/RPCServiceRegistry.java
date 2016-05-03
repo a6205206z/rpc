@@ -30,12 +30,16 @@ public class RPCServiceRegistry {
 	private String rootPath;
 	private int sessionTimeout;
 	
+	public void setZookeeper(String connectionString){
+		this.connectionString = connectionString;
+	}
 	
+	public void setZookeeperRootPath(String rootPath){
+		this.rootPath = rootPath;
+	}
 	
-	private RPCServiceRegistry(String zkConnectionString,String zkRootPath,int zkSessionTimeout){
-		this.connectionString = zkConnectionString;
-		this.sessionTimeout = zkSessionTimeout;
-		this.rootPath = zkRootPath;
+	public void setSessionTimeout(int sessionTimeout){
+		this.sessionTimeout = sessionTimeout;
 	}
 	
 	public static RPCServiceRegistry Create(){
