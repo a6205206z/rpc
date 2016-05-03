@@ -63,12 +63,18 @@ public class RpcProvider {
     xmlns="http://www.springframework.org/schema/beans"  
     xsi:schemaLocation="http://www.springframework.org/schema/beans  
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">  
-    <bean id="serviceRegistry" class="com.uoko.rpc.framework.RPCServiceRegistry">  
-        <constructor-arg value="127.0.0.1:2181"/>
-        <constructor-arg value="/services"/>
-        <constructor-arg value="10000"/>
+    <bean id="serviceRegistry" class="com.uoko.rpc.framework.RPCServiceRegistry">
+	    <property name="zookeeper">
+			<value>127.0.0.1:2181</value>
+		</property>
+		<property name="zookeeperRootPath">
+			<value>/services</value>
+		</property>
+		<property name="sessionTimeout">
+			<value>10000</value>
+		</property>
     </bean>  
-</beans>
+</beans>  
 ```
 
 ##客户端演示
