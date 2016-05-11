@@ -3,7 +3,7 @@
 
 ##包含功能有：
 ###1. 远程调用
-####服务端演示
+####Provider演示
 #####HelloService.java
 ```java
 package com.uoko.rpc.example.services;
@@ -53,7 +53,7 @@ public class RpcProvider {
 
 ```
 
-####客户端演示
+####Consumer演示
 #####HelloService.java
 ```java
 package com.uoko.rpc.example.client;
