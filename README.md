@@ -62,8 +62,13 @@ public class RpcProvider {
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
     xmlns="http://www.springframework.org/schema/beans"  
     xsi:schemaLocation="http://www.springframework.org/schema/beans  
-    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">  
-    <bean id="serviceRegistry" class="com.uoko.rpc.framework.RPCServiceRegistry">
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <bean id="serviceRegistryFactory" class="com.uoko.rpc.framework.serviceregistry.ServiceRegistryFactory">
+	    <property name="loadServiceRegistry">
+			<value>zookeeperServiceRegistry</value>
+		</property>
+    </bean> 
+    <bean id="zookeeperServiceRegistry" class="com.uoko.rpc.framework.serviceregistry.ZookeeperServiceRegistry">
 	    <property name="zookeeper">
 			<value>127.0.0.1:2181</value>
 		</property>
@@ -73,7 +78,7 @@ public class RpcProvider {
 		<property name="sessionTimeout">
 			<value>10000</value>
 		</property>
-    </bean>  
+    </bean> 
 </beans>  
 ```
 
