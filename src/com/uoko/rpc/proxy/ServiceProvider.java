@@ -6,7 +6,7 @@
  *
  * @author      Cean Cheng
  * */
-package com.uoko.rpc.framework;
+package com.uoko.rpc.proxy;
 
 import java.lang.reflect.Method;
 
@@ -17,15 +17,15 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 import com.uoko.rpc.example.services.HelloService;
-import com.uoko.rpc.framework.server.RPCServer;
-import com.uoko.rpc.framework.serviceregistry.ServiceRegistry;
-import com.uoko.rpc.framework.serviceregistry.ServiceRegistryFactory;
-import com.uoko.rpc.framework.transfer.PRCMethod;
+import com.uoko.rpc.registry.ServiceRegistry;
+import com.uoko.rpc.registry.ServiceRegistryFactory;
+import com.uoko.rpc.transport.MethodInfo;
+import com.uoko.rpc.transport.Server;
 
-public class RPCServiceHost {
-	private static final Logger logger = Logger.getLogger(RPCServiceHost.class); 
+public class ServiceProvider {
+	private static final Logger logger = Logger.getLogger(ServiceProvider.class); 
 	
-	public static void export(final Object service,String version,String ip,int port) throws Exception{
+	public static void provide(final Object service,String version,String ip,int port) throws Exception{
 		if(service == null){
 			logger.error("service instance == null");
 			throw new IllegalArgumentException("service instance == null");
@@ -40,12 +40,12 @@ public class RPCServiceHost {
 		 * start service 
 		 * 
 		 * */
-		RPCServer server = new RPCServer(port,
+		Server server = new Server(port,
 				new SimpleChannelHandler(){
 			@Override
 			public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-				if(e.getMessage() instanceof PRCMethod){
-					PRCMethod  rpcMethod = (PRCMethod) e.getMessage();
+				if(e.getMessage() instanceof MethodInfo){
+					MethodInfo  rpcMethod = (MethodInfo) e.getMessage();
 					Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
 					rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
 					
@@ -56,7 +56,7 @@ public class RPCServiceHost {
  
 		});
 		
-		Channel bind = server.Start();
+		Channel bind = server.start();
 		logger.info("Export service " + service.getClass().getName() + "on " + bind.getLocalAddress());
 		
 		
@@ -66,7 +66,7 @@ public class RPCServiceHost {
 		 * 
 		 * */
 		ServiceRegistry serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
-		serviceRegistry.Register(HelloService.class,version, String.format("%s:%d",ip,port));
+		serviceRegistry.register(HelloService.class,version, String.format("%s:%d",ip,port));
 		logger.info("Register service " + service.getClass().getName() + "on zookeeper");
 	}
 }

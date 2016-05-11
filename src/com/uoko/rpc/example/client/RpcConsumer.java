@@ -9,14 +9,14 @@ package com.uoko.rpc.example.client;
 
 
 import com.uoko.rpc.example.services.HelloService;
-import com.uoko.rpc.framework.RPCClientProxy;
+import com.uoko.rpc.proxy.ServiceProxy;
 
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
 		//invoke
-		RPCClientProxy<HelloService> proxy = new RPCClientProxy<HelloService>(HelloService.class, "1.0", "127.0.0.1:2181", "/services", 10000);
-		HelloService service = proxy.refer();
+		ServiceProxy proxy = ServiceProxy.getInstance();
+		HelloService service = proxy.refer(HelloService.class,"1.0");
 		for(int i = 0;i < 100; ++i){
 			String result = service.hello("Cean");
 			System.out.println(result);

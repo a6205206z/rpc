@@ -1,4 +1,4 @@
-package com.uoko.rpc.framework.serviceregistry;
+package com.uoko.rpc.registry;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
@@ -10,7 +10,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 
-import com.uoko.rpc.framework.annotations.RPCMethod;
+import com.uoko.rpc.annotations.RPCMethod;
 
 public class ZookeeperServiceRegistry 
 implements ServiceRegistry{
@@ -34,7 +34,7 @@ implements ServiceRegistry{
 	}
 	
 	@Override
-	public <T> void Register(Class<T> interfaceClass, String version, String serviceAddress) {
+	public <T> void register(Class<T> interfaceClass, String version, String serviceAddress) {
 		String methodsInfo = "";
 		
 		Method[] methods = interfaceClass.getMethods();

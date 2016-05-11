@@ -7,8 +7,8 @@
  * */
 package com.uoko.rpc.example.services;
 
-import com.uoko.rpc.framework.annotations.RPCMethod;
-import com.uoko.rpc.framework.annotations.RPCService;
+import com.uoko.rpc.annotations.RPCMethod;
+import com.uoko.rpc.annotations.RPCService;
 
 @RPCService(name = "HelloService", type = HelloService.class)
 public interface HelloService {

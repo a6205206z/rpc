@@ -1,4 +1,4 @@
-package com.uoko.rpc.framework.serviceregistry;
+package com.uoko.rpc.registry;
 
 public interface ServiceRegistry {
 	/*
@@ -11,5 +11,5 @@ public interface ServiceRegistry {
      * 			  127.0.0.1:8080
      * 
 	 * */
-	<T> void Register(final Class<T> interfaceClass,String version,String serviceAddress);
+	<T> void register(final Class<T> interfaceClass,String version,String serviceAddress);
 }

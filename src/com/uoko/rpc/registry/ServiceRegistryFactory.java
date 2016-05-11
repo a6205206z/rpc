@@ -1,4 +1,4 @@
-package com.uoko.rpc.framework.serviceregistry;
+package com.uoko.rpc.registry;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;

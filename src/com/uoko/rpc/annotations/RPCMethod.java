@@ -1,11 +1,11 @@
 /*
- * {@code RPCService}
+ * {@code RPCMethod}
  * 
  *
  *
  * @author      Cean Cheng
  * */
-package com.uoko.rpc.framework.annotations;
+package com.uoko.rpc.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,10 +14,9 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Component;
 
-@Target({ ElementType.TYPE })
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface RPCService {
-    String name() default "";
-    Class<?> type();
+public @interface RPCMethod {
+	String name() default "";
 }

@@ -1,55 +1,56 @@
 /*
- * {@code RPCServer}
+ * {@code RPCClient}
  * 
  *
  *
  * @author      Cean Cheng
  * */
-package com.uoko.rpc.framework.server;
+package com.uoko.rpc.transport;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.SimpleChannelHandler;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.serialization.ClassResolvers;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
-public class RPCServer {
-	final ServerBootstrap bootstrap = new ServerBootstrap(
-			new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool())
+public class Client {
+	final ClientBootstrap bootstrap = new ClientBootstrap(
+			new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool())
 			);
+	
 	String host;
 	int port;
 	
-	public RPCServer(int port,SimpleChannelHandler invokeHandler){
-		
+	public Client(String host,int port){
+		this.host = host;
 		this.port = port;
+	}
+	
+	public void invoke(SimpleChannelHandler invokeMthodHandler){
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory(){
-			
+
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
-
 				return Channels.pipeline(
 						new ObjectDecoder(ClassResolvers.cacheDisabled(this
 				                .getClass().getClassLoader())), 
-						new ObjectEncoder(),
-						invokeHandler
+						new ObjectEncoder(), 
+						invokeMthodHandler
 						);
 			}
-
+			
 		});
 		
-	}
-	
-	public Channel Start(){
-		Channel bind = bootstrap.bind(new InetSocketAddress(port));
-		return bind;
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host,port));
+		future.getChannel().getCloseFuture().awaitUninterruptibly();
+		bootstrap.releaseExternalResources();
 	}
 }

@@ -4,7 +4,7 @@
  *
  * @author      Cean Cheng
  * */
-package com.uoko.rpc.framework;
+package com.uoko.rpc.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -19,24 +19,30 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-import com.uoko.rpc.example.services.HelloService;
-import com.uoko.rpc.framework.client.RPCClient;
-import com.uoko.rpc.framework.transfer.PRCMethod;
+import com.uoko.rpc.discovery.ServiceDiscovery;
+import com.uoko.rpc.discovery.ServiceDiscoveryFactory;
+import com.uoko.rpc.discovery.ServiceDiscoveryHandler;
 
-public class RPCClientProxy<T> {
-	private static final Logger logger = Logger.getLogger(RPCClientProxy.class); 
+import com.uoko.rpc.transport.Client;
+import com.uoko.rpc.transport.MethodInfo;
+
+public class ServiceProxy {
+	private static final Logger logger = Logger.getLogger(ServiceProxy.class); 
+	private static ServiceProxy instance; 
 	
-	private Class<T> serviceInterfaceClass;
+	private ServiceProxy(){}
 	
-	public RPCClientProxy(final Class<T> interfaceClass,String version,String zkConnectionString,String registerRootPath,
-			int zkSessionTimeout){
-		this.serviceInterfaceClass = interfaceClass;
+	public static synchronized ServiceProxy getInstance(){
+		if(instance == null){
+			instance = new ServiceProxy();
+		}
+		return instance;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public T refer() throws Exception{
-		return (T) Proxy.newProxyInstance(serviceInterfaceClass.getClassLoader(), new Class<?>[]{serviceInterfaceClass}, new InvocationHandler(){
-			PRCMethod rpcMethod = null;
+	public <T> T refer(final Class<T> interfaceClass,String version) throws Exception{
+		return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[]{interfaceClass}, new InvocationHandler(){
+			MethodInfo rpcMethod = null;
 			List<String> serviceAddressList = null;
 			
 			/*
@@ -51,15 +57,18 @@ public class RPCClientProxy<T> {
 						CountDownLatch latch = new CountDownLatch(1);
 						//init serviceAddress
 						//discover service
-						RPCServiceDiscovery<HelloService> serviceDiscovery = new RPCServiceDiscovery<HelloService>(HelloService.class,"1.0","127.0.0.1:2181", "/services", 10000, 
-								new RPCServiceDiscoveryHandler(){
-									@Override
-									public void serviceChanged(List<String> addressList) {
-										serviceAddressList = addressList;
-										latch.countDown();
-									}
+						
+						ServiceDiscovery serviceDiscovery = ServiceDiscoveryFactory.getInstance().createServiceDiscovery();
+						
+						serviceDiscovery.beginDiscovery(interfaceClass, version, new ServiceDiscoveryHandler(){
+							@Override
+							public void serviceChanged(List<String> addressList) {
+								serviceAddressList = addressList;
+								latch.countDown();
+							}
 						});
-						serviceDiscovery.Init();
+						
+						
 						latch.await();
 					}
 					catch(Exception e){
@@ -81,7 +90,7 @@ public class RPCClientProxy<T> {
 			
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
-				rpcMethod = new PRCMethod();
+				rpcMethod = new MethodInfo();
 				rpcMethod.setMethodName(method.getName());
 				rpcMethod.setParameterTypes(method.getParameterTypes());
 				rpcMethod.setParameters(arguments);
@@ -102,8 +111,8 @@ public class RPCClientProxy<T> {
 				}
 				
 				logger.debug("invoke on " + address);
-				RPCClient client = new RPCClient(host,port);
-				client.Invoke(
+				Client client = new Client(host,port);
+				client.invoke(
 						new SimpleChannelHandler(){
 
 							@Override
@@ -114,9 +123,9 @@ public class RPCClientProxy<T> {
 							
 							@Override
 							public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-								if(e.getMessage() instanceof PRCMethod)
+								if(e.getMessage() instanceof MethodInfo)
 								{
-									rpcMethod = (PRCMethod)e.getMessage();
+									rpcMethod = (MethodInfo)e.getMessage();
 									super.messageReceived(ctx, e);
 								}
 								e.getChannel().close();
