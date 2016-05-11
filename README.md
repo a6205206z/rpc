@@ -3,7 +3,7 @@
 
 ##包含功能有：
 ###1. 远程调用
-####Provider演示
+####1.1Provider演示
 #####HelloService.java
 ```java
 package com.uoko.rpc.example.services;
@@ -53,7 +53,7 @@ public class RpcProvider {
 
 ```
 
-####Consumer演示
+####1.2Consumer演示
 #####HelloService.java
 ```java
 package com.uoko.rpc.example.client;
@@ -94,8 +94,8 @@ public class RpcConsumer {
 ####2.1服务注册  
 多注册中心  
 zookeeper注册中心  
-zookeeper注册中心配置实例  
-server.xml  
+#####zookeeper注册中心配置实例  
+######server.xml  
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
@@ -122,3 +122,6 @@ server.xml
 ```
 
 ###3. 软负载
+目前支持以下负载策略  
+####3.1随机策略  
+####3.2轮询策略  
