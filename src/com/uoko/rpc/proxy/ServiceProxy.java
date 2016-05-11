@@ -10,7 +10,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -22,15 +21,20 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import com.uoko.rpc.discovery.ServiceDiscovery;
 import com.uoko.rpc.discovery.ServiceDiscoveryFactory;
 import com.uoko.rpc.discovery.ServiceDiscoveryHandler;
-
+import com.uoko.rpc.loadbalance.LoadbalanceStrategy;
+import com.uoko.rpc.loadbalance.LoadbalanceStrategySelector;
 import com.uoko.rpc.transport.Client;
 import com.uoko.rpc.transport.MethodInfo;
 
 public class ServiceProxy {
 	private static final Logger logger = Logger.getLogger(ServiceProxy.class); 
 	private static ServiceProxy instance; 
+	private LoadbalanceStrategy loadbalanceStrategy ;
 	
-	private ServiceProxy(){}
+	private ServiceProxy(){
+		loadbalanceStrategy 
+			= LoadbalanceStrategySelector.SelectStrategy("RandomSelect");
+	}
 	
 	public static synchronized ServiceProxy getInstance(){
 		if(instance == null){
@@ -49,7 +53,7 @@ public class ServiceProxy {
 			 * This code needs to be optimized
 			 * 
 			 * */
-			private String RandomServiceAddress(){
+			private String getServiceAddress(){
 				
 				//
 				if(this.serviceAddressList == null){
@@ -81,10 +85,8 @@ public class ServiceProxy {
 					logger.error("Can''t find sevice");
 					throw new IllegalArgumentException("serviceAddressList == null");
 				}
-				
-				Random random =new Random();
-				int index = random.nextInt(serviceAddressList.size());
-				String address = serviceAddressList.get(index);
+
+				String address = loadbalanceStrategy.selectOne(serviceAddressList);
 				return address;
 			}
 			
@@ -96,7 +98,7 @@ public class ServiceProxy {
 				rpcMethod.setParameters(arguments);
 				
 
-				String address = RandomServiceAddress();
+				String address = getServiceAddress();
 				String host = address.split(":")[0];
 				int port = Integer.parseInt(address.split(":")[1]);
 				
