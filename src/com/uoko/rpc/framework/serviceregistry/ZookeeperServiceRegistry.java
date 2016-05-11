@@ -1,11 +1,4 @@
-/*
- * {@code RPCServiceRegistry}
- * 
- *
- *
- * @author      Cean Cheng
- * */
-package com.uoko.rpc.framework;
+package com.uoko.rpc.framework.serviceregistry;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
@@ -16,15 +9,13 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.uoko.rpc.framework.annotations.RPCMethod;
 
-public class RPCServiceRegistry {
-	private static final Logger logger = Logger.getLogger(RPCServiceRegistry.class); 
+public class ZookeeperServiceRegistry 
+implements ServiceRegistry{
+	private static final Logger logger = Logger.getLogger(ZookeeperServiceRegistry.class);
 	private CountDownLatch latch = new CountDownLatch(1);
-	private static ApplicationContext ctx = new ClassPathXmlApplicationContext("server.xml");
 	
 	private String connectionString;
 	private String rootPath;
@@ -42,18 +33,8 @@ public class RPCServiceRegistry {
 		this.sessionTimeout = sessionTimeout;
 	}
 	
-	public static RPCServiceRegistry Create(){
-		RPCServiceRegistry serviceRegistry = null;
-		try{
-			serviceRegistry = (RPCServiceRegistry)ctx.getBean("serviceRegistry");
-		}
-		catch(Exception e){
-			logger.error(e);
-		}
-		return serviceRegistry;
-	}
-	
-	public <T> void Register(final Class<T> interfaceClass,String version,String serviceAddress){
+	@Override
+	public <T> void Register(Class<T> interfaceClass, String version, String serviceAddress) {
 		String methodsInfo = "";
 		
 		Method[] methods = interfaceClass.getMethods();

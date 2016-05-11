@@ -18,6 +18,8 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 
 import com.uoko.rpc.example.services.HelloService;
 import com.uoko.rpc.framework.server.RPCServer;
+import com.uoko.rpc.framework.serviceregistry.ServiceRegistry;
+import com.uoko.rpc.framework.serviceregistry.ServiceRegistryFactory;
 import com.uoko.rpc.framework.transfer.PRCMethod;
 
 public class RPCServiceHost {
@@ -63,7 +65,7 @@ public class RPCServiceHost {
 		 * register service
 		 * 
 		 * */
-		RPCServiceRegistry serviceRegistry = RPCServiceRegistry.Create();
+		ServiceRegistry serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
 		serviceRegistry.Register(HelloService.class,version, String.format("%s:%d",ip,port));
 		logger.info("Register service " + service.getClass().getName() + "on zookeeper");
 	}
