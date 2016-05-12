@@ -26,6 +26,7 @@ import com.uoko.rpc.loadbalance.LoadbalanceStrategy;
 import com.uoko.rpc.loadbalance.LoadbalanceStrategySelector;
 import com.uoko.rpc.transport.Client;
 import com.uoko.rpc.transport.MethodInfo;
+import com.uoko.rpc.transport.Transporter;
 
 public class ServiceProxy {
 	private static final Logger logger = Logger.getLogger(ServiceProxy.class); 
@@ -47,9 +48,8 @@ public class ServiceProxy {
 	@SuppressWarnings("unchecked")
 	public <T> T refer(final Class<T> interfaceClass,String version) throws Exception{
 		return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[]{interfaceClass}, new InvocationHandler(){
-			MethodInfo rpcMethod = null;
-			List<String> serviceAddressList = null;
-			
+			List<String> serviceAddressList = null;		
+			Object reulst = null;
 			/*
 			 * This code needs to be optimized
 			 * 
@@ -93,11 +93,6 @@ public class ServiceProxy {
 			
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
-				rpcMethod = new MethodInfo();
-				rpcMethod.setMethodName(method.getName());
-				rpcMethod.setParameterTypes(method.getParameterTypes());
-				rpcMethod.setParameters(arguments);
-				
 
 				String address = getServiceAddress();
 				String host = address.split(":")[0];
@@ -113,6 +108,7 @@ public class ServiceProxy {
 					throw new IllegalArgumentException("Invalid port " + port);
 				}
 				
+				
 				logger.debug("invoke on " + address);
 				Client client = new Client(host,port);
 				client.invoke(
@@ -121,21 +117,27 @@ public class ServiceProxy {
 							@Override
 							public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
 								super.channelConnected(ctx, e);
-								e.getChannel().write(rpcMethod);
+								MethodInfo rpcMethod = new MethodInfo();
+								rpcMethod.setMethodName(method.getName());
+								rpcMethod.setParameterTypes(method.getParameterTypes());
+								rpcMethod.setParameters(arguments);
+								Transporter transporter = new Transporter(rpcMethod);
+								e.getChannel().write(transporter);
 							}
 							
 							@Override
 							public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-								if(e.getMessage() instanceof MethodInfo)
+								if(e.getMessage() instanceof Transporter)
 								{
-									rpcMethod = (MethodInfo)e.getMessage();
+									Transporter transporter = (Transporter)e.getMessage();
+									reulst = transporter.getMethodInfo().getResult();
 									super.messageReceived(ctx, e);
 								}
 								e.getChannel().close();
 							}
 				});
 				
-				return rpcMethod.getResult();
+				return reulst;
 			}
 			
 		});

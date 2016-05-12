@@ -40,7 +40,8 @@ public class Server {
 			public ChannelPipeline getPipeline() throws Exception {
 
 				return Channels.pipeline(
-						new ObjectDecoder(ClassResolvers.cacheDisabled(this
+						//weakCachingConcurrentResolver concurrent
+						new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
 				                .getClass().getClassLoader())), 
 						new ObjectEncoder(),
 						invokeHandler

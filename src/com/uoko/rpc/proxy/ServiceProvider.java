@@ -21,6 +21,7 @@ import com.uoko.rpc.registry.ServiceRegistry;
 import com.uoko.rpc.registry.ServiceRegistryFactory;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.Server;
+import com.uoko.rpc.transport.Transporter;
 
 public class ServiceProvider {
 	private static final Logger logger = Logger.getLogger(ServiceProvider.class); 
@@ -44,12 +45,22 @@ public class ServiceProvider {
 				new SimpleChannelHandler(){
 			@Override
 			public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-				if(e.getMessage() instanceof MethodInfo){
-					MethodInfo  rpcMethod = (MethodInfo) e.getMessage();
-					Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
-					rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
-					
-					e.getChannel().write(rpcMethod);
+				if(e.getMessage() instanceof Transporter){
+					Transporter transporter = (Transporter) e.getMessage();
+					try{
+						MethodInfo rpcMethod = transporter.getMethodInfo();
+						
+						Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
+						rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
+						
+						transporter.setStatusCode(200);
+					}catch(Exception ex){
+						logger.error(ex);
+						transporter.setStatusCode(500);
+						transporter.setExceptionBody(ex.getMessage());
+					}finally{
+						e.getChannel().write(transporter);
+					}
 				}
 				super.messageReceived(ctx, e);
 			}
