@@ -24,7 +24,10 @@ import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Client {
 	final ClientBootstrap bootstrap = new ClientBootstrap(
-			new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool())
+			new NioClientSocketChannelFactory(
+					Executors.newCachedThreadPool(),
+					Executors.newCachedThreadPool()
+					)
 			);
 	
 	String host;

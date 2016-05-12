@@ -9,13 +9,25 @@
 package com.uoko.rpc.transport;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class MethodInfo implements Serializable {
 	private static final long serialVersionUID = 1510326612440404416L;
+	
+	private String methodID;
 	private String methodName;
 	private Class<?>[] parameterTypes;
 	private Object[] parameters;
 	private Object result;
+	
+	public MethodInfo(){
+		//create id for method data
+		this.methodID = UUID.randomUUID().toString();
+	}
+	
+	public String getMethodID(){
+		return methodID;
+	}
 	
 	public String getMethodName() {
 		return methodName;
@@ -23,18 +35,21 @@ public class MethodInfo implements Serializable {
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
 	}
+	
 	public Class<?>[] getParameterTypes() {
 		return parameterTypes;
 	}
 	public void setParameterTypes(Class<?>[] parameterTypes) {
 		this.parameterTypes = parameterTypes;
 	}
+	
 	public Object[] getParameters() {
 		return parameters;
 	}
 	public void setParameters(Object[] parameters) {
 		this.parameters = parameters;
 	}
+	
 	public Object getResult() {
 		return result;
 	}

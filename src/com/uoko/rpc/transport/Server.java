@@ -24,9 +24,11 @@ import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Server {
 	final ServerBootstrap bootstrap = new ServerBootstrap(
-			new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool())
+			new NioServerSocketChannelFactory(
+					Executors.newCachedThreadPool(),
+					Executors.newCachedThreadPool()
+					)
 			);
-	String host;
 	int port;
 	
 	public Server(int port,SimpleChannelHandler invokeHandler){
