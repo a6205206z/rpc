@@ -32,10 +32,13 @@ public class ServiceProxy {
 	private static final Logger logger = Logger.getLogger(ServiceProxy.class); 
 	private static ServiceProxy instance; 
 	private LoadbalanceStrategy loadbalanceStrategy ;
+	private ServiceDiscovery serviceDiscovery;
 	
 	private ServiceProxy(){
 		loadbalanceStrategy 
 			= LoadbalanceStrategySelector.SelectStrategy("RandomSelect");
+		serviceDiscovery 
+			= ServiceDiscoveryFactory.getInstance().createServiceDiscovery();
 	}
 	
 	public static synchronized ServiceProxy getInstance(){
@@ -62,9 +65,7 @@ public class ServiceProxy {
 						CountDownLatch latch = new CountDownLatch(1);
 						//init serviceAddress
 						//discover service
-						
-						ServiceDiscovery serviceDiscovery = ServiceDiscoveryFactory.getInstance().createServiceDiscovery();
-						
+
 						serviceDiscovery.beginDiscovery(interfaceClass, version, new ServiceDiscoveryHandler(){
 							@Override
 							public void serviceChanged(List<String> addressList) {
@@ -137,9 +138,14 @@ public class ServiceProxy {
 							}
 				});
 				
+				
 				return reulst;
 			}
 			
 		});
+	}
+	
+	public void close(){
+		serviceDiscovery.endDiscovery();
 	}
 }

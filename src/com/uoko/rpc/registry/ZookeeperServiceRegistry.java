@@ -62,7 +62,6 @@ implements ServiceRegistry{
 	
 	private ZooKeeper zkConnect(){
 		ZooKeeper zk = null;
-		
 		try {
 			zk = new ZooKeeper(connectionString,sessionTimeout, new Watcher(){
 				@Override

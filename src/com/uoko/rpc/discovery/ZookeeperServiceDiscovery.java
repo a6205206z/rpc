@@ -25,6 +25,7 @@ implements ServiceDiscovery{
 	private String connectionString;
 	private String rootPath;
 	private int sessionTimeout;
+	private ZooKeeper zookeeper;
 	
 	public void setZookeeper(String connectionString){
 		this.connectionString = connectionString;
@@ -81,10 +82,20 @@ implements ServiceDiscovery{
 	@Override
 	public <T> void beginDiscovery(final Class<T> interfaceClass,String version,ServiceDiscoveryHandler discoveryHandler) {
 		logger.info("Service Discovery init.");
-		ZooKeeper zk = zkConnect();
+		zookeeper = zkConnect();
 		String serviceAddressZKPath = rootPath + "/" + interfaceClass.getSimpleName() + "/" + version;
-		if(zk!=null){
-			WatchNode(zk,serviceAddressZKPath,discoveryHandler);
+		if(zookeeper!=null){
+			WatchNode(zookeeper,serviceAddressZKPath,discoveryHandler);
 		}
+	}
+
+	@Override
+	public void endDiscovery() {
+		try {
+			zookeeper.close();
+		} catch (InterruptedException e) {
+			logger.error(e);
+		}
+		
 	}
 }

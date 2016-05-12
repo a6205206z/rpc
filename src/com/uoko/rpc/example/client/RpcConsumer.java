@@ -21,5 +21,7 @@ public class RpcConsumer {
 			String result = service.hello("Cean");
 			System.out.println(result);
 		}
+		
+		proxy.close();
 	}
 }
