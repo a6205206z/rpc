@@ -1,11 +1,11 @@
 /*
- * {@code RPCServiceHost}
+ * {@code ServiceProvider}
  * 
- * the host of service 
  *
  *
  * @author      Cean Cheng
  * */
+
 package com.uoko.rpc.proxy;
 
 import java.lang.reflect.Method;

@@ -1,3 +1,11 @@
+/*
+ * {@code ServiceRegistryFactory}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
+
 package com.uoko.rpc.registry;
 
 import org.apache.log4j.Logger;

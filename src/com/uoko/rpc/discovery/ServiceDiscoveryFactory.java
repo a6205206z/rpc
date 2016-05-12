@@ -1,3 +1,11 @@
+/*
+ * {@code ServiceDiscoveryFactory}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
+
 package com.uoko.rpc.discovery;
 
 import org.apache.log4j.Logger;

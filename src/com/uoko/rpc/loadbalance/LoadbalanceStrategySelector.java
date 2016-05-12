@@ -1,3 +1,11 @@
+/*
+ * {@code LoadbalanceStrategySelector}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
+
 package com.uoko.rpc.loadbalance;
 
 public class LoadbalanceStrategySelector {

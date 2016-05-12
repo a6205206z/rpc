@@ -1,10 +1,11 @@
 /*
- * {@code RPCClient}
+ * {@code Client}
  * 
  *
  *
  * @author      Cean Cheng
  * */
+
 package com.uoko.rpc.transport;
 
 import java.net.InetSocketAddress;

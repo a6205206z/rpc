@@ -1,3 +1,9 @@
+/*
+ * {@code ServiceRegistry} 
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.registry;
 
 public interface ServiceRegistry {

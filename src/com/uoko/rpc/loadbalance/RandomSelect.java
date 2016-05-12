@@ -1,3 +1,11 @@
+/*
+ * {@code RandomSelect}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
+
 package com.uoko.rpc.loadbalance;
 
 import java.util.List;

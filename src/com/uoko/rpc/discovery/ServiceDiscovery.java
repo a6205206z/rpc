@@ -1,3 +1,10 @@
+/*
+ * {@code ServiceDiscovery}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
 package com.uoko.rpc.discovery;
 
 public interface ServiceDiscovery {

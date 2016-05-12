@@ -1,10 +1,11 @@
 /*
- * {@code PRCMethod}
+ * {@code MethodInfo}
  * 
  *
  *
  * @author      Cean Cheng
  * */
+
 package com.uoko.rpc.transport;
 
 import java.io.Serializable;
