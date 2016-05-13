@@ -117,7 +117,6 @@ public class ServiceProxy {
 
 							@Override
 							public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
-								super.channelConnected(ctx, e);
 								MethodInfo rpcMethod = new MethodInfo();
 								rpcMethod.setMethodName(method.getName());
 								rpcMethod.setParameterTypes(method.getParameterTypes());
@@ -132,7 +131,6 @@ public class ServiceProxy {
 								{
 									Transporter transporter = (Transporter)e.getMessage();
 									reulst = transporter.getMethodInfo().getResult();
-									super.messageReceived(ctx, e);
 								}
 								e.getChannel().close();
 							}

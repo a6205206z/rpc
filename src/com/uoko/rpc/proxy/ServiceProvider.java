@@ -11,7 +11,6 @@ package com.uoko.rpc.proxy;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
@@ -36,48 +35,63 @@ public class ServiceProvider {
 			throw new IllegalArgumentException("Invalid port");
 		}
 		
-		/*
-		 * 
-		 * start service 
-		 * 
-		 * */
-		Server server = new Server(port,
-				new SimpleChannelHandler(){
-			@Override
-			public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-				if(e.getMessage() instanceof Transporter){
-					Transporter transporter = (Transporter) e.getMessage();
-					try{
-						MethodInfo rpcMethod = transporter.getMethodInfo();
-						
-						Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
-						rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
-						
-						transporter.setStatusCode(200);
-					}catch(Exception ex){
-						logger.error(ex);
-						transporter.setStatusCode(500);
-						transporter.setExceptionBody(ex.getMessage());
-					}finally{
-						e.getChannel().write(transporter);
+		Server server = null;
+		ServiceRegistry serviceRegistry = null;
+		
+		try{
+			/*
+			 * 
+			 * start service 
+			 * 
+			 * */
+			server = new Server(port,
+					new SimpleChannelHandler(){
+				@Override
+				public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
+					if(e.getMessage() instanceof Transporter){
+						Transporter transporter = (Transporter) e.getMessage();
+						try{
+							MethodInfo rpcMethod = transporter.getMethodInfo();
+							
+							Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
+							rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
+							
+							transporter.setStatusCode(200);
+						}catch(Exception ex){
+							logger.error(ex);
+							transporter.setStatusCode(500);
+							transporter.setExceptionBody(ex.getMessage());
+						}finally{
+							e.getChannel().write(transporter);
+						}
 					}
 				}
-				super.messageReceived(ctx, e);
+	 
+			});
+			
+			
+		
+			server.start();
+			logger.info("Export service " + service.getClass().getName() + "on " + server.getServerAddress());
+			
+			
+			/*
+			 * 
+			 * register service
+			 * 
+			 * */
+			serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
+			serviceRegistry.register(HelloService.class,version, String.format("%s:%d",ip,port));
+			logger.info("Register service " + service.getClass().getName() + "on zookeeper");
+		}catch(Exception e){
+			if(server != null){
+				server.close();
 			}
- 
-		});
-		
-		Channel bind = server.start();
-		logger.info("Export service " + service.getClass().getName() + "on " + bind.getLocalAddress());
-		
-		
-		/*
-		 * 
-		 * register service
-		 * 
-		 * */
-		ServiceRegistry serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
-		serviceRegistry.register(HelloService.class,version, String.format("%s:%d",ip,port));
-		logger.info("Register service " + service.getClass().getName() + "on zookeeper");
+			if(serviceRegistry!=null){
+				serviceRegistry.close();
+			}
+			logger.error(e);
+		}
 	}
+
 }

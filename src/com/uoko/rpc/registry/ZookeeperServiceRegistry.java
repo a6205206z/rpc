@@ -29,6 +29,8 @@ implements ServiceRegistry{
 	private String rootPath;
 	private int sessionTimeout;
 	
+	private ZooKeeper zookeeper;
+	
 	public void setZookeeper(String connectionString){
 		this.connectionString = connectionString;
 	}
@@ -42,7 +44,8 @@ implements ServiceRegistry{
 	}
 	
 	@Override
-	public <T> void register(Class<T> interfaceClass, String version, String serviceAddress) {
+	public <T> void register(Class<T> interfaceClass, String version, String serviceAddress)
+			throws InterruptedException{
 		String methodsInfo = "";
 		
 		Method[] methods = interfaceClass.getMethods();
@@ -54,9 +57,11 @@ implements ServiceRegistry{
 			}
 		}
 		
-		ZooKeeper zk = zkConnect();
-		if(zk != null){
-			createNode(zk,interfaceClass.getSimpleName(),version,serviceAddress,methodsInfo);
+		zookeeper = zkConnect();
+		if(zookeeper != null){
+			createNode(zookeeper,interfaceClass.getSimpleName(),version,serviceAddress,methodsInfo);
+		}else{
+			throw new InterruptedException("Register failed");
 		}
 	}
 	
@@ -111,6 +116,15 @@ implements ServiceRegistry{
 			
 			logger.info("create zookeeper node : " + result);
 		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+
+	@Override
+	public void close() {
+		try {
+			zookeeper.close();
+		} catch (InterruptedException e) {
 			logger.error(e);
 		}
 	}

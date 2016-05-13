@@ -9,6 +9,7 @@
 package com.uoko.rpc.transport;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -23,6 +24,7 @@ import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Server {
+	private Channel bind;
 	final ServerBootstrap bootstrap = new ServerBootstrap(
 			new NioServerSocketChannelFactory(
 					Executors.newCachedThreadPool(),
@@ -52,8 +54,40 @@ public class Server {
 		
 	}
 	
-	public Channel start(){
-		Channel bind = bootstrap.bind(new InetSocketAddress(port));
-		return bind;
+	/*
+	 * 
+	 * start server
+	 * 
+	 * 
+	 * */
+	public void start(){
+		bind = bootstrap.bind(new InetSocketAddress(port));
+	}
+	
+	/*
+	 * 
+	 * 
+	 * close server
+	 * 
+	 * 
+	 * 
+	 * */
+	public void close(){
+		bind.close();
+	}
+
+	/*
+	 * 
+	 * 
+	 * get server address
+	 * 
+	 * 
+	 * */
+	public SocketAddress getServerAddress() {
+		SocketAddress address = null;
+		if(bind != null){
+			address = bind.getLocalAddress();
+		}
+		return address;
 	}
 }

@@ -17,5 +17,14 @@ public interface ServiceRegistry {
      * 			  127.0.0.1:8080
      * 
 	 * */
-	<T> void register(final Class<T> interfaceClass,String version,String serviceAddress);
+	<T> void register(final Class<T> interfaceClass,String version,String serviceAddress) throws InterruptedException;
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * */
+	void close();
 }
