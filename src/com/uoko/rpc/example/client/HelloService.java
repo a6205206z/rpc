@@ -7,6 +7,8 @@
  * */
 package com.uoko.rpc.example.client;
 
+import com.uoko.rpc.example.services.PersonEnttiy;
+
 public interface HelloService {
-	String hello(String name);
+	String hello(PersonEnttiy person);
 }

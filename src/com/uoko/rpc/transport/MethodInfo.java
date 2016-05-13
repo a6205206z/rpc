@@ -11,7 +11,7 @@ package com.uoko.rpc.transport;
 import java.io.Serializable;
 
 public class MethodInfo implements Serializable {
-	private static final long serialVersionUID = 1510326612440404416L;
+	private static final long serialVersionUID = 1L;
 	
 	private String methodName;
 	private Class<?>[] parameterTypes;

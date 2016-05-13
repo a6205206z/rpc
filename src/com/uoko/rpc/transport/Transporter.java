@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class Transporter implements Serializable {
-	private static final long serialVersionUID = 1510326612440404416L;
+	private static final long serialVersionUID = 1L;
 
 	private String transporterID;
 	private MethodInfo methodInfo;

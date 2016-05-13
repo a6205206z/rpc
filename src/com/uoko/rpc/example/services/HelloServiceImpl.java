@@ -9,8 +9,8 @@ package com.uoko.rpc.example.services;
 
 public class HelloServiceImpl implements HelloService {
 	@Override
-	public String hello(String name) {
-		return "Hello " + name;
+	public String hello(PersonEnttiy person) {
+		return "Hello " + person.getName();
 	}
 	
 }
