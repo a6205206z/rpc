@@ -6,83 +6,122 @@
 ####1.1.Provider演示
 #####HelloService.java
 ```java
-package com.uoko.rpc.example.services;
-
-import com.uoko.rpc.framework.annotations.RPCMethod;
-import com.uoko.rpc.framework.annotations.RPCService;
-
 @RPCService(name = "HelloService", type = HelloService.class)
 public interface HelloService {
 	@RPCMethod(name="hello")
-	String hello(String name);
+	String hello(PersonEnttiy person);
 }
-
 ```
 
 #####HelloServiceImpl.java
 ```java
-package com.uoko.rpc.example.services;
-
 public class HelloServiceImpl implements HelloService {
 	@Override
-	public String hello(String name) {
-		return "Hello " + name;
+	public String hello(PersonEnttiy person) {
+		return "Hello " + person.getName();
 	}
 	
 }
+```
 
-
+#####PersonEnttiy.java
+```java
+public class PersonEnttiy implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String sex;
+	private int age;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSex() {
+		return sex;
+	}
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+}
 ```
 
 #####RpcProvider.java
 ```java
-package com.uoko.rpc.example.services;
-
-import com.uoko.rpc.proxy.ServiceProvider;
-
 public class RpcProvider {
 	public static void main(String[] args) throws Exception{
 		//step 1.  create service
 		HelloService service = new HelloServiceImpl();
 		
 		//step 2. provide service
-		ServiceProvider.provide(service,"1.0","127.0.0.1",8080);
+		ServiceProvider.provide(service,"1.0","192.168.99.1",8080);
 	}
 }
-
-
 ```
 
 ####1.2.Consumer演示
 #####HelloService.java
 ```java
-package com.uoko.rpc.example.client;
-
 public interface HelloService {
-	String hello(String name);
+	String hello(PersonEnttiy person);
 }
 ```
 
 #####RpcConsumer.java
 ```java
-package com.uoko.rpc.example.client;
-
-
-import com.uoko.rpc.example.services.HelloService;
-import com.uoko.rpc.proxy.ServiceProxy;
-
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
 		//invoke
 		ServiceProxy proxy = ServiceProxy.getInstance();
 		HelloService service = proxy.refer(HelloService.class,"1.0");
-		String result = service.hello("Cean");
+		PersonEnttiy person = null;
+		
+		person = new PersonEnttiy();
+		person.setName("Cean Cheng");
+		person.setSex("Male");
+		person.setAge(10);
+		String result = service.hello(person);
+		System.out.println(result);
+
+		
+		proxy.close();
 	}
 }
+```
 
-
-
+#####PersonEnttiy.java
+```java
+public class PersonEnttiy implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String sex;
+	private int age;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSex() {
+		return sex;
+	}
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+}
 ```
 
 ###2. 服务注册与发现
