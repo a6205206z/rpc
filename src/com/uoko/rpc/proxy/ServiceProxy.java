@@ -9,6 +9,7 @@ import com.uoko.rpc.cluster.Router;
 public class ServiceProxy<T> {
 	 
 	private Class<T> interfaceClass;
+	private String version;
 	private Router<T> router;
 	
 	
@@ -16,6 +17,7 @@ public class ServiceProxy<T> {
 	
 	public ServiceProxy(final Class<T> interfaceClass,String version){
 		this.interfaceClass = interfaceClass;
+		this.version = version;
 		this.router = new Router<T>(interfaceClass,version);
 	}
 	
@@ -33,7 +35,7 @@ public class ServiceProxy<T> {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				String address = router.getServiceAddress();
-				Invoker invoker = new Invoker();
+				Invoker<T> invoker = new Invoker<T>(interfaceClass, version);
 				return invoker.invoke(method, args, address);
 			}
 		});

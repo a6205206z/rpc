@@ -15,26 +15,28 @@ public class Context implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String transporterID;
-	private MethodInfo methodInfo;
+	private ServiceInfo service;
+	private MethodInfo method;
 	private int statusCode;
 	private String exceptionBody;
 	
-	public Context(MethodInfo methodInfo){
+	public Context(ServiceInfo service,MethodInfo method){
 		this.transporterID = UUID.randomUUID().toString();
-		this.methodInfo = methodInfo;
+		this.service = service;
+		this.method = method;
 	}
 	
 	public String getTransporterID(){
 		return transporterID;
 	}
 
-	public MethodInfo getMethodInfo() {
-		return methodInfo;
+	public MethodInfo getMethod() {
+		return method;
 	}
 	
 
-	public void setMethodInfo(MethodInfo methodInfo) {
-		this.methodInfo = methodInfo;
+	public void setMethod(MethodInfo methodInfo) {
+		this.method = methodInfo;
 	}
 
 	public int getStatusCode() {
@@ -51,6 +53,14 @@ public class Context implements Serializable {
 
 	public void setExceptionBody(String exceptionBody) {
 		this.exceptionBody = exceptionBody;
+	}
+
+	public ServiceInfo getService() {
+		return service;
+	}
+
+	public void setService(ServiceInfo service) {
+		this.service = service;
 	}
 	
 }

@@ -59,7 +59,7 @@ implements ServiceRegistry{
 		
 		zookeeper = zkConnect();
 		if(zookeeper != null){
-			createNode(zookeeper,interfaceClass.getSimpleName(),version,serviceAddress,methodsInfo);
+			createNode(zookeeper,interfaceClass.getName(),version,serviceAddress,methodsInfo);
 		}else{
 			throw new InterruptedException("Register failed");
 		}

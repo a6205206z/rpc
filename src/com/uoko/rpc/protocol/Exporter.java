@@ -8,41 +8,84 @@
 
 package com.uoko.rpc.protocol;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.uoko.rpc.example.services.HelloService;
 import com.uoko.rpc.registry.ServiceRegistry;
 import com.uoko.rpc.registry.ServiceRegistryFactory;
 import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.Server;
+import com.uoko.rpc.transport.ServiceInfo;
 
 public class Exporter {
 	private static final Logger logger = Logger.getLogger(Exporter.class); 
+	private static ApplicationContext ctx = new ClassPathXmlApplicationContext("server.xml");
 	private static Exporter instance;
 	
-	private Exporter(){}
+	private ConcurrentHashMap<String,Invoker> serviceInvokers; 
+	private ServiceRegistry serviceRegistry;
+	private Server server;
+	
+	private String address;
+	private int port;
+	
+	public void setAddress(String address){
+		this.address = address;
+	}
+	public void setPort(int port){
+		this.port = port;
+	}
+	
+	private Exporter(){
+	}
 
 	public static Exporter getInstance() {  
 		if(instance == null){
-			instance = new Exporter();
+			instance = (Exporter)ctx.getBean("exporter");
+			instance.serviceInvokers = new ConcurrentHashMap<String,Invoker>();
+			instance.serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
 		}
 		return instance;
 	}
 	
-	public void export(final Object service,String version,String ip,int port) throws Exception{
-		if(port <= 0 || port > 65535){
-			logger.error("Invalid port");
-			throw new IllegalArgumentException("Invalid port");
+	public <T> void AddService(final Class<T> interfaceClass,final Object service,String version) 
+			throws InterruptedException{
+		if(service == null){
+			logger.error("service == null");
+			throw new IllegalArgumentException("service == null");
 		}
 		
-		Server server = null;
-		ServiceRegistry serviceRegistry = null;
-		Invoker invoker = new Invoker(service);
+
+		if(serviceInvokers.get(getServiceInvokersKey(interfaceClass.getName(), version)) == null){
+			Invoker invoker = new Invoker(service);
+			serviceInvokers.put(getServiceInvokersKey(interfaceClass.getName(), version), invoker);
+			serviceRegistry.register(interfaceClass,version, String.format("%s:%d",address,port));
+		}
+
+	}
+	
+	private String getServiceInvokersKey(String serviceName,String version){
+		if(serviceName == null){
+			logger.error("serviceName == null");
+			throw new IllegalArgumentException("serviceName == null");
+		}
+		if(version == null){
+			logger.error("version == null");
+			throw new IllegalArgumentException("version == null");
+		}
 		
+		return serviceName + version;
+	}
+	
+	public void export() throws Exception{
+
 		try{
 			/*
 			 * 
@@ -56,7 +99,12 @@ public class Exporter {
 					if(e.getMessage() instanceof Context){
 						Context context = (Context) e.getMessage();
 						try{
-							MethodInfo rpcMethod = context.getMethodInfo();
+							ServiceInfo rpcService = context.getService(); 
+							MethodInfo rpcMethod = context.getMethod();
+							
+							
+							Invoker invoker = 
+									serviceInvokers.get(getServiceInvokersKey(rpcService.getServiceName(), rpcService.getVersion()));
 							
 							rpcMethod.setResult(invoker.invoke(
 									rpcMethod.getMethodName(),
@@ -79,17 +127,6 @@ public class Exporter {
 			
 		
 			server.start();
-			logger.info("Export service " + service.getClass().getName() + "on " + server.getServerAddress());
-			
-			
-			/*
-			 * 
-			 * register service
-			 * 
-			 * */
-			serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
-			serviceRegistry.register(HelloService.class,version, String.format("%s:%d",ip,port));
-			logger.info("Register service " + service.getClass().getName() + "on zookeeper");
 		}catch(Exception e){
 			if(server != null){
 				server.close();

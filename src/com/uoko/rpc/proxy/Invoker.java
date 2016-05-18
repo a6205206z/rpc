@@ -10,6 +10,7 @@ package com.uoko.rpc.proxy;
 
 import java.lang.reflect.Method;
 
+
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -19,17 +20,18 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import com.uoko.rpc.transport.Client;
 import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
+import com.uoko.rpc.transport.ServiceInfo;
 
-public class Invoker{
-	private static final Logger logger = Logger.getLogger(Invoker.class); 
+public class Invoker<T>{
+	private static final Logger logger = Logger.getLogger(Invoker.class);
 	
-	
+	private Class<T> interfaceClass;
+	private String version;
 	
 	private Object reulst = null;
-	
-	
-	protected Invoker(){
-		
+	protected Invoker(final Class<T> interfaceClass,String version){
+		this.interfaceClass = interfaceClass;
+		this.version = version;
 	}
 
 	public Object invoke(Method method, Object[] arguments,String address)
@@ -57,11 +59,15 @@ public class Invoker{
 
 					@Override
 					public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
+						ServiceInfo rpcService = new ServiceInfo();
+						rpcService.setServiceName(interfaceClass.getName());
+						rpcService.setVersion(version);
+						
 						MethodInfo rpcMethod = new MethodInfo();
 						rpcMethod.setMethodName(method.getName());
 						rpcMethod.setParameterTypes(method.getParameterTypes());
 						rpcMethod.setParameters(arguments);
-						Context context = new Context(rpcMethod);
+						Context context = new Context(rpcService,rpcMethod);
 						e.getChannel().write(context);
 					}
 					
@@ -70,7 +76,7 @@ public class Invoker{
 						if(e.getMessage() instanceof Context)
 						{
 							Context context = (Context)e.getMessage();
-							reulst = context.getMethodInfo().getResult();
+							reulst = context.getMethod().getResult();
 						}
 						e.getChannel().close();
 					}

@@ -83,7 +83,7 @@ implements ServiceDiscovery{
 	public <T> void beginDiscovery(final Class<T> interfaceClass,String version,ServiceDiscoveryHandler discoveryHandler) {
 		logger.info("Service Discovery init.");
 		zookeeper = zkConnect();
-		String serviceAddressZKPath = rootPath + "/" + interfaceClass.getSimpleName() + "/" + version;
+		String serviceAddressZKPath = rootPath + "/" + interfaceClass.getName() + "/" + version;
 		if(zookeeper!=null){
 			WatchNode(zookeeper,serviceAddressZKPath,discoveryHandler);
 		}

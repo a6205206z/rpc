@@ -14,7 +14,10 @@ public class RpcProvider {
 		//step 1.  create service
 		HelloService service = new HelloServiceImpl();
 		
-		//step 2. provide service
-		Exporter.getInstance().export(service,"1.0","192.168.99.1",8080);
+		//step 2. addservice in
+		Exporter.getInstance().AddService(HelloService.class,service, "1.0");
+		
+		//step 3. provide service
+		Exporter.getInstance().export();
 	}
 }
