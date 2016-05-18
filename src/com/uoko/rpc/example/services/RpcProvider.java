@@ -7,7 +7,7 @@
  * */
 package com.uoko.rpc.example.services;
 
-import com.uoko.rpc.proxy.ServiceProvider;
+import com.uoko.rpc.protocol.Exporter;
 
 public class RpcProvider {
 	public static void main(String[] args) throws Exception{
@@ -15,6 +15,6 @@ public class RpcProvider {
 		HelloService service = new HelloServiceImpl();
 		
 		//step 2. provide service
-		ServiceProvider.provide(service,"1.0","192.168.99.1",8080);
+		Exporter.getInstance().export(service,"1.0","192.168.99.1",8080);
 	}
 }

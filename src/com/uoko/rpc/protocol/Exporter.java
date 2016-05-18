@@ -1,14 +1,12 @@
 /*
- * {@code ServiceProvider}
+ * {@code Exporter}
  * 
  *
  *
  * @author      Cean Cheng
  * */
 
-package com.uoko.rpc.proxy;
-
-import java.lang.reflect.Method;
+package com.uoko.rpc.protocol;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -22,14 +20,20 @@ import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.Server;
 import com.uoko.rpc.transport.Transporter;
 
-public class ServiceProvider {
-	private static final Logger logger = Logger.getLogger(ServiceProvider.class); 
+public class Exporter {
+	private static final Logger logger = Logger.getLogger(Exporter.class); 
+	private static Exporter instance;
 	
-	public static void provide(final Object service,String version,String ip,int port) throws Exception{
-		if(service == null){
-			logger.error("service instance == null");
-			throw new IllegalArgumentException("service instance == null");
+	private Exporter(){}
+
+	public static Exporter getInstance() {  
+		if(instance == null){
+			instance = new Exporter();
 		}
+		return instance;
+	}
+	
+	public void export(final Object service,String version,String ip,int port) throws Exception{
 		if(port <= 0 || port > 65535){
 			logger.error("Invalid port");
 			throw new IllegalArgumentException("Invalid port");
@@ -37,6 +41,7 @@ public class ServiceProvider {
 		
 		Server server = null;
 		ServiceRegistry serviceRegistry = null;
+		Invoker invoker = new Invoker(service);
 		
 		try{
 			/*
@@ -53,8 +58,10 @@ public class ServiceProvider {
 						try{
 							MethodInfo rpcMethod = transporter.getMethodInfo();
 							
-							Method method = service.getClass().getMethod(rpcMethod.getMethodName(), rpcMethod.getParameterTypes());
-							rpcMethod.setResult(method.invoke(service, rpcMethod.getParameters()));
+							rpcMethod.setResult(invoker.invoke(
+									rpcMethod.getMethodName(),
+									rpcMethod.getParameterTypes(), 
+									rpcMethod.getParameters()));
 							
 							transporter.setStatusCode(200);
 						}catch(Exception ex){
