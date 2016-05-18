@@ -79,8 +79,8 @@ public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
 		//invoke
-		ServiceProxy proxy = ServiceProxy.getInstance();
-		HelloService service = proxy.refer(HelloService.class,"1.0");
+		ServiceProxy<HelloService> proxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
+		HelloService service = proxy.refer();
 		PersonEnttiy person = null;
 		
 		person = new PersonEnttiy();
