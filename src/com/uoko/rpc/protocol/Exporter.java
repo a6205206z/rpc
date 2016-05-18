@@ -16,9 +16,9 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import com.uoko.rpc.example.services.HelloService;
 import com.uoko.rpc.registry.ServiceRegistry;
 import com.uoko.rpc.registry.ServiceRegistryFactory;
+import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.Server;
-import com.uoko.rpc.transport.Transporter;
 
 public class Exporter {
 	private static final Logger logger = Logger.getLogger(Exporter.class); 
@@ -53,23 +53,23 @@ public class Exporter {
 					new SimpleChannelHandler(){
 				@Override
 				public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-					if(e.getMessage() instanceof Transporter){
-						Transporter transporter = (Transporter) e.getMessage();
+					if(e.getMessage() instanceof Context){
+						Context context = (Context) e.getMessage();
 						try{
-							MethodInfo rpcMethod = transporter.getMethodInfo();
+							MethodInfo rpcMethod = context.getMethodInfo();
 							
 							rpcMethod.setResult(invoker.invoke(
 									rpcMethod.getMethodName(),
 									rpcMethod.getParameterTypes(), 
 									rpcMethod.getParameters()));
 							
-							transporter.setStatusCode(200);
+							context.setStatusCode(200);
 						}catch(Exception ex){
 							logger.error(ex);
-							transporter.setStatusCode(500);
-							transporter.setExceptionBody(ex.getMessage());
+							context.setStatusCode(500);
+							context.setExceptionBody(ex.getMessage());
 						}finally{
-							e.getChannel().write(transporter);
+							e.getChannel().write(context);
 						}
 					}
 				}

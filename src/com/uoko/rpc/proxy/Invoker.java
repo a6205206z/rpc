@@ -17,8 +17,8 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 import com.uoko.rpc.transport.Client;
+import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
-import com.uoko.rpc.transport.Transporter;
 
 public class Invoker{
 	private static final Logger logger = Logger.getLogger(Invoker.class); 
@@ -49,6 +49,8 @@ public class Invoker{
 		
 		
 		logger.debug("invoke on " + address);
+		
+		
 		Client client = new Client(host,port);
 		client.invoke(
 				new SimpleChannelHandler(){
@@ -59,16 +61,16 @@ public class Invoker{
 						rpcMethod.setMethodName(method.getName());
 						rpcMethod.setParameterTypes(method.getParameterTypes());
 						rpcMethod.setParameters(arguments);
-						Transporter transporter = new Transporter(rpcMethod);
-						e.getChannel().write(transporter);
+						Context context = new Context(rpcMethod);
+						e.getChannel().write(context);
 					}
 					
 					@Override
 					public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-						if(e.getMessage() instanceof Transporter)
+						if(e.getMessage() instanceof Context)
 						{
-							Transporter transporter = (Transporter)e.getMessage();
-							reulst = transporter.getMethodInfo().getResult();
+							Context context = (Context)e.getMessage();
+							reulst = context.getMethodInfo().getResult();
 						}
 						e.getChannel().close();
 					}

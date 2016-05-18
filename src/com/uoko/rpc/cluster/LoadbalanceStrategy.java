@@ -6,7 +6,7 @@
  * @author      Cean Cheng
  * */
 
-package com.uoko.rpc.loadbalance;
+package com.uoko.rpc.cluster;
 
 import java.util.List;
 
