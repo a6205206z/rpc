@@ -113,7 +113,7 @@ public class RpcProvider {
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
-		ServiceProxy<HelloService> helloServiceProxy = 				 ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
+		ServiceProxy<HelloService> helloServiceProxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
 		HelloService helloService = helloServiceProxy.refer();
 		PersonEnttiy person = null;
 		
