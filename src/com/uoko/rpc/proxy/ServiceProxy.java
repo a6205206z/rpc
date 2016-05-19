@@ -33,8 +33,16 @@ public class ServiceProxy<T> {
 		this.router = new Router<T>(interfaceClass,version);
 	}
 	
+	/*
+	 * 
+	 * 
+	 * 
+	 * get instance each intetface
+	 * 
+	 * 
+	 * */
 	@SuppressWarnings("unchecked")
-	public static synchronized <T> ServiceProxy<T> getInstance(final Class<T> interfaceClass,String version){
+	public static synchronized <T> ServiceProxy<T> getInstanceEachInterface(final Class<T> interfaceClass,String version){
 		
 		if(existInstances == null){
 			existInstances = new ConcurrentHashMap<String,ServiceProxy<?>>();

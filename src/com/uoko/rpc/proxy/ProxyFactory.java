@@ -38,7 +38,7 @@ public class ProxyFactory {
 	 * 
 	 * */
 	public synchronized <T> ServiceProxy<T> createProxy(final Class<T> interfaceClass,String version) {
-		return ServiceProxy.getInstance(interfaceClass, version);
+		return ServiceProxy.getInstanceEachInterface(interfaceClass, version);
 	}
 
 }
