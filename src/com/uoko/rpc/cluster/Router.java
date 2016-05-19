@@ -63,7 +63,7 @@ public class Router<T> {
 			throw new IllegalArgumentException("serviceAddressList == null");
 		}
 
-		String address = loadbalanceStrategy.selectOne(serviceAddressList);
+		String address = loadbalanceStrategy.selectOne(this.serviceAddressList);
 		return address;
 	}
 	
