@@ -3,7 +3,7 @@
 
 ##包含功能有：
 ###1. 远程调用
-####1.1.Provider演示
+####1.1.统一接口
 #####HelloService.java
 ```java
 @RPCService(name = "HelloService", type = HelloService.class)
@@ -12,6 +12,42 @@ public interface HelloService {
 	String hello(PersonEnttiy person);
 }
 ```
+#####UserService.java
+```java
+@RPCService(name = "UserService", type = UserService.class)
+public interface UserService {
+	@RPCMethod(name="hello")
+	PersonEnttiy getOnePerson();
+}
+```
+#####PersonEnttiy.java
+```java
+public class PersonEnttiy implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String sex;
+	private int age;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSex() {
+		return sex;
+	}
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+}
+```
+####1.2.Provider演示
 
 #####HelloServiceImpl.java
 ```java
@@ -57,10 +93,13 @@ public class PersonEnttiy implements Serializable {
 public class RpcProvider {
 	public static void main(String[] args) throws Exception{
 		//step 1.  create service
-		HelloService service = new HelloServiceImpl();
+		HelloService helloService = new HelloServiceImpl();
+		UserService userService = new UserServiceImpl();
 		
 		//step 2. addservice in
-		Exporter.getInstance().AddService(HelloService.class,service, "1.0");
+		Exporter.getInstance().AddService(HelloService.class,helloService, "1.0");
+		Exporter.getInstance().AddService(UserService.class, userService, "1.0");
+		
 		
 		//step 3. provide service
 		Exporter.getInstance().export();
@@ -68,61 +107,35 @@ public class RpcProvider {
 }
 ```
 
-####1.2.Consumer演示
-#####HelloService.java
-```java
-public interface HelloService {
-	String hello(PersonEnttiy person);
-}
-```
-
+####1.3.Consumer演示
 #####RpcConsumer.java
 ```java
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
-		//invoke
-		ServiceProxy<HelloService> proxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
-		HelloService service = proxy.refer();
+		ServiceProxy<HelloService> helloServiceProxy = 				 ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
+		HelloService helloService = helloServiceProxy.refer();
 		PersonEnttiy person = null;
 		
 		person = new PersonEnttiy();
 		person.setName("Cean Cheng");
 		person.setSex("Male");
 		person.setAge(10);
-		String result = service.hello(person);
+		String result = helloService.hello(person);
 		System.out.println(result);
-
 		
-		proxy.close();
-	}
-}
-```
-
-#####PersonEnttiy.java
-```java
-public class PersonEnttiy implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private String name;
-	private String sex;
-	private int age;
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getSex() {
-		return sex;
-	}
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-	public int getAge() {
-		return age;
-	}
-	public void setAge(int age) {
-		this.age = age;
+		
+		
+		ServiceProxy<UserService> userServiceProxy = ProxyFactory.getInstance().createProxy(UserService.class, "1.0");
+		UserService userService = userServiceProxy.refer();
+		
+		person = userService.getOnePerson();
+		
+		System.out.println(person.getSex());
+		
+		
+		helloServiceProxy.close();
+		userServiceProxy.close();
 	}
 }
 ```
