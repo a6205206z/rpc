@@ -8,14 +8,14 @@
 
 package com.uoko.rpc.proxy;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class ProxyFactory {
+	
+	
 	private static ProxyFactory instance;
-	private ConcurrentHashMap<String,ServiceProxy<?>> existProxy;
+	
 	
 	private ProxyFactory(){
-		existProxy = new ConcurrentHashMap<String,ServiceProxy<?>>();
+		
 	}
 	/*
 	 * 
@@ -37,14 +37,8 @@ public class ProxyFactory {
 	 * 
 	 * 
 	 * */
-	@SuppressWarnings("unchecked")
 	public synchronized <T> ServiceProxy<T> createProxy(final Class<T> interfaceClass,String version) {
-		ServiceProxy<?> proxy = existProxy.get(interfaceClass+version);
-		if(proxy == null){
-			existProxy.put(interfaceClass+version, new ServiceProxy<T>(interfaceClass,version));
-			proxy = existProxy.get(interfaceClass+version);
-		}
-		
-		return (ServiceProxy<T>)proxy;
+		return ServiceProxy.getInstance(interfaceClass, version);
 	}
+
 }

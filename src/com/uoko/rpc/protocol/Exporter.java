@@ -63,15 +63,15 @@ public class Exporter {
 		}
 		
 
-		if(serviceInvokers.get(getServiceInvokersKey(interfaceClass.getName(), version)) == null){
+		if(serviceInvokers.get(generateServiceInvokersKey(interfaceClass.getName(), version)) == null){
 			Invoker invoker = new Invoker(service);
-			serviceInvokers.put(getServiceInvokersKey(interfaceClass.getName(), version), invoker);
+			serviceInvokers.put(generateServiceInvokersKey(interfaceClass.getName(), version), invoker);
 			serviceRegistry.register(interfaceClass,version, String.format("%s:%d",address,port));
 		}
 
 	}
 	
-	private String getServiceInvokersKey(String serviceName,String version){
+	private String generateServiceInvokersKey(String serviceName,String version){
 		if(serviceName == null){
 			logger.error("serviceName == null");
 			throw new IllegalArgumentException("serviceName == null");
@@ -104,7 +104,7 @@ public class Exporter {
 							
 							
 							Invoker invoker = 
-									serviceInvokers.get(getServiceInvokersKey(rpcService.getServiceName(), rpcService.getVersion()));
+									serviceInvokers.get(generateServiceInvokersKey(rpcService.getServiceName(), rpcService.getVersion()));
 							
 							rpcMethod.setResult(invoker.invoke(
 									rpcMethod.getMethodName(),

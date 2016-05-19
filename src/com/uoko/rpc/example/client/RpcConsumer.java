@@ -8,26 +8,38 @@
 package com.uoko.rpc.example.client;
 
 
-import com.uoko.rpc.example.services.HelloService;
-import com.uoko.rpc.example.services.PersonEnttiy;
+import com.uoko.rpc.example.interfaces.HelloService;
+import com.uoko.rpc.example.interfaces.PersonEnttiy;
+import com.uoko.rpc.example.interfaces.UserService;
 import com.uoko.rpc.proxy.ProxyFactory;
 import com.uoko.rpc.proxy.ServiceProxy;
 
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
-		ServiceProxy<HelloService> proxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
-		HelloService service = proxy.refer();
-		PersonEnttiy person = null;
-		for(int i = 0;i < 100; ++i){
-			person = new PersonEnttiy();
-			person.setName("Cean Cheng");
-			person.setSex("Male");
-			person.setAge(10);
-			String result = service.hello(person);
-			System.out.println(result);
-		}
 		
-		proxy.close();
+		ServiceProxy<HelloService> helloServiceProxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
+		HelloService helloService = helloServiceProxy.refer();
+		PersonEnttiy person = null;
+		
+		person = new PersonEnttiy();
+		person.setName("Cean Cheng");
+		person.setSex("Male");
+		person.setAge(10);
+		String result = helloService.hello(person);
+		System.out.println(result);
+		
+		
+		
+		ServiceProxy<UserService> userServiceProxy = ProxyFactory.getInstance().createProxy(UserService.class, "1.0");
+		UserService userService = userServiceProxy.refer();
+		
+		person = userService.getOnePerson();
+		
+		System.out.println(person.getSex());
+		
+		
+		helloServiceProxy.close();
+		userServiceProxy.close();
 	}
 }

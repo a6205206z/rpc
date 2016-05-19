@@ -5,7 +5,7 @@
  *
  * @author      Cean Cheng
  * */
-package com.uoko.rpc.example.services;
+package com.uoko.rpc.example.interfaces;
 
 import com.uoko.rpc.annotations.RPCMethod;
 import com.uoko.rpc.annotations.RPCService;

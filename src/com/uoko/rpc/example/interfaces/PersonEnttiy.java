@@ -1,4 +1,11 @@
-package com.uoko.rpc.example.services;
+/*
+ * {@code PersonEnttiy}
+ * 
+ *
+ *
+ * @author      Cean Cheng
+ * */
+package com.uoko.rpc.example.interfaces;
 
 import java.io.Serializable;
 
