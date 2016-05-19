@@ -152,21 +152,29 @@ zookeeper注册中心
     xmlns="http://www.springframework.org/schema/beans"  
     xsi:schemaLocation="http://www.springframework.org/schema/beans  
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-    <bean id="serviceRegistryFactory" class="com.uoko.rpc.framework.serviceregistry.ServiceRegistryFactory">
-	<property name="loadServiceRegistry">
-		<value>zookeeperServiceRegistry</value>
-	</property>
+    <bean id="serviceRegistryFactory" class="com.uoko.rpc.registry.ServiceRegistryFactory">
+	    <property name="loadServiceRegistry">
+			<value>zookeeperServiceRegistry</value>
+		</property>
     </bean> 
-    <bean id="zookeeperServiceRegistry" class="com.uoko.rpc.framework.serviceregistry.ZookeeperServiceRegistry">
-	<property name="zookeeper">
-		<value>127.0.0.1:2181</value>
-	</property>
-	<property name="zookeeperRootPath">
-		<value>/services</value>
-	</property>
-	<property name="sessionTimeout">
-		<value>10000</value>
-	</property>
+    <bean id="zookeeperServiceRegistry" class="com.uoko.rpc.registry.ZookeeperServiceRegistry">
+	    <property name="zookeeper">
+			<value>127.0.0.1:2181</value>
+		</property>
+		<property name="zookeeperRootPath">
+			<value>/services</value>
+		</property>
+		<property name="sessionTimeout">
+			<value>10000</value>
+		</property>
+    </bean>
+    <bean id="exporter" class="com.uoko.rpc.protocol.Exporter">
+	    <property name="address">
+			<value>192.168.99.1</value>
+		</property>
+		<property name="port">
+			<value>8080</value>
+		</property>
     </bean> 
 </beans>  
 ```
