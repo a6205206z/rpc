@@ -113,29 +113,38 @@ public class RpcProvider {
 public class RpcConsumer {
 	public static void main(String[] args) throws Exception{
 		
-		ServiceProxy<HelloService> helloServiceProxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
-		HelloService helloService = helloServiceProxy.refer();
-		PersonEnttiy person = null;
 		
-		person = new PersonEnttiy();
-		person.setName("Cean Cheng");
-		person.setSex("Male");
-		person.setAge(10);
-		String result = helloService.hello(person);
-		System.out.println(result);
+		ServiceProxy<HelloService> helloServiceProxy = ProxyFactory.getInstance().createProxy(HelloService.class,"1.0");
+		try{
+			HelloService helloService = helloServiceProxy.refer();
+			PersonEnttiy person = null;
+			
+			person = new PersonEnttiy();
+			person.setName("Cean Cheng");
+			person.setSex("Male");
+			person.setAge(10);
+			String result = helloService.hello(person);
+			System.out.println(result);
+		}catch(Exception e){
+			
+		}finally{
+			helloServiceProxy.close();
+		}
 		
 		
 		
 		ServiceProxy<UserService> userServiceProxy = ProxyFactory.getInstance().createProxy(UserService.class, "1.0");
-		UserService userService = userServiceProxy.refer();
-		
-		person = userService.getOnePerson();
-		
-		System.out.println(person.getSex());
-		
-		
-		helloServiceProxy.close();
-		userServiceProxy.close();
+		try{
+			UserService userService = userServiceProxy.refer();
+			PersonEnttiy person = userService.getOnePerson();
+			
+			System.out.println(person.getSex());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			userServiceProxy.close();
+		}
 	}
 }
 ```

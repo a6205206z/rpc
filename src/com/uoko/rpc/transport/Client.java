@@ -13,14 +13,11 @@ import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.handler.codec.serialization.ClassResolvers;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
+
+
+import com.uoko.rpc.pipeline.ClientPipelineFactory;
 
 public class Client {
 	final ClientBootstrap bootstrap = new ClientBootstrap(
@@ -39,20 +36,7 @@ public class Client {
 	}
 	
 	public void invoke(SimpleChannelHandler invokeMthodHandler){
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory(){
-
-			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(
-						//weakCachingConcurrentResolver concurrent
-						new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
-				                .getClass().getClassLoader())), 
-						new ObjectEncoder(), 
-						invokeMthodHandler
-						);
-			}
-			
-		});
+		bootstrap.setPipelineFactory(new ClientPipelineFactory(invokeMthodHandler));
 		
 		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host,port));
 		future.getChannel().getCloseFuture().awaitUninterruptibly();

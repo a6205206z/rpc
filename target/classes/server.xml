@@ -19,7 +19,7 @@
 			<value>10000</value>
 		</property>
     </bean>
-    <bean id="exporter" class="com.uoko.rpc.protocol.Exporter">
+    <bean id="exporter" class="com.uoko.rpc.provider.Exporter">
 	    <property name="address">
 			<value>192.168.99.1</value>
 		</property>

@@ -9,7 +9,7 @@ package com.uoko.rpc.example.services;
 
 import com.uoko.rpc.example.interfaces.HelloService;
 import com.uoko.rpc.example.interfaces.UserService;
-import com.uoko.rpc.protocol.Exporter;
+import com.uoko.rpc.provider.Exporter;
 
 public class RpcProvider {
 	public static void main(String[] args) throws Exception{

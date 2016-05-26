@@ -6,7 +6,7 @@
  * @author      Cean Cheng
  * */
 
-package com.uoko.rpc.protocol;
+package com.uoko.rpc.provider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
