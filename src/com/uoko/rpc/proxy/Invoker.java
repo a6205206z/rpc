@@ -10,17 +10,15 @@ package com.uoko.rpc.proxy;
 
 import java.lang.reflect.Method;
 
-
 import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
 
 import com.uoko.rpc.transport.Client;
 import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.ServiceInfo;
+
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
 
 public class Invoker<T>{
 	private static final Logger logger = Logger.getLogger(Invoker.class);
@@ -54,35 +52,47 @@ public class Invoker<T>{
 		
 		
 		Client client = new Client(host,port);
-		client.invoke(
-				new SimpleChannelHandler(){
+			client.invoke(
+					new ChannelHandlerAdapter(){
 
-					@Override
-					public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
-						ServiceInfo rpcService = new ServiceInfo();
-						rpcService.setServiceName(interfaceClass.getName());
-						rpcService.setVersion(version);
-						
-						MethodInfo rpcMethod = new MethodInfo();
-						rpcMethod.setMethodName(method.getName());
-						rpcMethod.setParameterTypes(method.getParameterTypes());
-						rpcMethod.setParameters(arguments);
-						Context context = new Context(rpcService,rpcMethod);
-						e.getChannel().write(context);
-					}
-					
-					@Override
-					public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
-						if(e.getMessage() instanceof Context)
-						{
-							Context context = (Context)e.getMessage();
-							reulst = context.getMethod().getResult();
+						@Override
+						public void channelActive(ChannelHandlerContext ctx) throws Exception{
+							ServiceInfo rpcService = new ServiceInfo();
+							rpcService.setServiceName(interfaceClass.getName());
+							rpcService.setVersion(version);
+							
+							MethodInfo rpcMethod = new MethodInfo();
+							rpcMethod.setMethodName(method.getName());
+							rpcMethod.setParameterTypes(method.getParameterTypes());
+							rpcMethod.setParameters(arguments);
+							Context context = new Context(rpcService,rpcMethod);
+							ctx.writeAndFlush(context);
 						}
-						e.getChannel().close();
+						
+						
+						@Override
+						public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
+							if(msg instanceof Context)
+							{
+								Context context = (Context)msg;
+								reulst = context.getMethod().getResult();
+							}
+						}
+						
+					    @Override
+					    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+					        ctx.flush();
+					        ctx.close();
+					    }
+					    
+					    @Override
+					    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+					            throws Exception {
+					        logger.error("Unexpected exception from downstream:"+cause.getMessage());
+					        ctx.close();
+					    }
 					}
-		});
-		
-		
+			);
 		return reulst;
 	}
 }

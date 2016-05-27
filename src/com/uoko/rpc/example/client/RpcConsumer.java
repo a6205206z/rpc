@@ -27,8 +27,11 @@ public class RpcConsumer {
 			person.setName("Cean Cheng");
 			person.setSex("Male");
 			person.setAge(10);
-			String result = helloService.hello(person);
-			System.out.println(result);
+			for(int i=0;i<10;i++){
+				String result = helloService.hello(person);
+				
+				System.out.println(result);
+			}
 		}catch(Exception e){
 			
 		}finally{
