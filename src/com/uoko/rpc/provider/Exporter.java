@@ -15,9 +15,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.uoko.rpc.common.ServiceHelper;
+import com.uoko.rpc.handler.ServerProcessHandler;
 import com.uoko.rpc.registry.ServiceRegistry;
 import com.uoko.rpc.registry.ServiceRegistryFactory;
 import com.uoko.rpc.transport.Server;
+
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Exporter {
 	private static final Logger logger = Logger.getLogger(Exporter.class); 
@@ -38,8 +45,7 @@ public class Exporter {
 		this.port = port;
 	}
 	
-	private Exporter(){
-	}
+	private Exporter(){ }
 
 	public static Exporter getInstance() {  
 		if(instance == null){
@@ -75,7 +81,17 @@ public class Exporter {
 			 * start service 
 			 * 
 			 * */
-			server = new Server(port,serviceInvokers);
+			server = new Server(port,
+					new ChannelInitializer<SocketChannel>() {  
+		            @Override  
+		            public void initChannel(SocketChannel ch) throws Exception {
+		            	ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
+				                .getClass().getClassLoader()))); 
+		            	ch.pipeline().addLast(new ObjectEncoder());
+		                ch.pipeline().addLast(new ServerProcessHandler(serviceInvokers));  
+		            }
+	            }
+			);
 			
 			
 		

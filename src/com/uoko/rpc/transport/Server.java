@@ -4,14 +4,12 @@
  *
  *
  * @author      Cean Cheng
+ * 
+ * 
  * */
 
 package com.uoko.rpc.transport;
 
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.uoko.rpc.handler.ServerProcessHandler;
-import com.uoko.rpc.provider.Invoker;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -21,9 +19,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Server {
 	private ChannelFuture channelFuture;
@@ -36,7 +31,7 @@ public class Server {
 	int port;
 	
 	
-	public Server(int port,ConcurrentHashMap<String,Invoker> serviceInvokers){
+	public Server(int port,ChannelInitializer<SocketChannel> handler){
 		bossGroup = new NioEventLoopGroup(); // (1) 
 		workerGroup = new NioEventLoopGroup();
 		bootstrap = new ServerBootstrap();
@@ -45,15 +40,7 @@ public class Server {
 		.channel(NioServerSocketChannel.class) // (3)  
         .option(ChannelOption.SO_BACKLOG, 1024)          // (5)  
         .childOption(ChannelOption.SO_KEEPALIVE, true)
-        .childHandler(new ChannelInitializer<SocketChannel>() {  
-            @Override  
-            public void initChannel(SocketChannel ch) throws Exception {
-            	ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
-		                .getClass().getClassLoader()))); 
-            	ch.pipeline().addLast(new ObjectEncoder());
-                ch.pipeline().addLast(new ServerProcessHandler(serviceInvokers));  
-            }
-            });// (6)  
+        .childHandler(handler);// (6)  
 		
 		this.port = port;
 		
