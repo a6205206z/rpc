@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.uoko.rpc.common.ServiceHelper;
+import com.uoko.rpc.handler.ProtocolProcessHandler;
 import com.uoko.rpc.handler.ServerProcessHandler;
 import com.uoko.rpc.registry.ServiceRegistry;
 import com.uoko.rpc.registry.ServiceRegistryFactory;
@@ -88,7 +89,8 @@ public class Exporter {
 		            	ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
 				                .getClass().getClassLoader()))); 
 		            	ch.pipeline().addLast(new ObjectEncoder());
-		                ch.pipeline().addLast(new ServerProcessHandler(serviceInvokers));  
+		            	ch.pipeline().addLast(new ProtocolProcessHandler());
+		                ch.pipeline().addLast(new ServerProcessHandler(serviceInvokers));
 		            }
 	            }
 			);

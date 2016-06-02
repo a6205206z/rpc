@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import org.apache.log4j.Logger;
 
 import com.uoko.rpc.transport.Client;
-import com.uoko.rpc.transport.Context;
+import com.uoko.rpc.transport.Transporter;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.ServiceInfo;
 
@@ -25,11 +25,19 @@ public class Invoker<T>{
 	
 	private Class<T> interfaceClass;
 	private String version;
+	private Client client;
 	
 	private Object reulst = null;
 	protected Invoker(final Class<T> interfaceClass,String version){
 		this.interfaceClass = interfaceClass;
 		this.version = version;
+		this.client = new Client();
+	}
+	
+	protected void dispose(){
+		if(this.client != null){
+			this.client.close();
+		}
 	}
 
 	public Object invoke(Method method, Object[] arguments,String address)
@@ -51,48 +59,52 @@ public class Invoker<T>{
 		logger.debug("invoke on " + address);
 		
 		
-		Client client = new Client(host,port);
-			client.invoke(
-					new ChannelHandlerAdapter(){
+		
+		client.invoke(host,port,
+				new ChannelHandlerAdapter(){
 
-						@Override
-						public void channelActive(ChannelHandlerContext ctx) throws Exception{
-							ServiceInfo rpcService = new ServiceInfo();
-							rpcService.setServiceName(interfaceClass.getName());
-							rpcService.setVersion(version);
-							
-							MethodInfo rpcMethod = new MethodInfo();
-							rpcMethod.setMethodName(method.getName());
-							rpcMethod.setParameterTypes(method.getParameterTypes());
-							rpcMethod.setParameters(arguments);
-							Context context = new Context(rpcService,rpcMethod);
-							ctx.writeAndFlush(context);
-						}
+					@Override
+					public void channelActive(ChannelHandlerContext ctx) throws Exception{
+						ServiceInfo rpcService = new ServiceInfo();
+						rpcService.setServiceName(interfaceClass.getName());
+						rpcService.setVersion(version);
 						
-						
-						@Override
-						public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
-							if(msg instanceof Context)
-							{
-								Context context = (Context)msg;
-								reulst = context.getMethod().getResult();
+						MethodInfo rpcMethod = new MethodInfo();
+						rpcMethod.setMethodName(method.getName());
+						rpcMethod.setParameterTypes(method.getParameterTypes());
+						rpcMethod.setParameters(arguments);
+						Transporter transporter = new Transporter(rpcService,rpcMethod);
+						ctx.writeAndFlush(transporter);
+					}
+					
+					
+					@Override
+					public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
+						if(msg instanceof Transporter)
+						{
+							Transporter transporter = (Transporter)msg;
+							if(transporter.getStatusCode() == 200){
+								reulst = transporter.getMethod().getResult();
+							}else{
+								throw new Exception(transporter.getExceptionBody());
 							}
 						}
-						
-					    @Override
-					    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-					        ctx.flush();
-					        ctx.close();
-					    }
-					    
-					    @Override
-					    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-					            throws Exception {
-					        logger.error("Unexpected exception from downstream:"+cause.getMessage());
-					        ctx.close();
-					    }
 					}
-			);
+					
+				    @Override
+				    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+				        ctx.flush();
+				        ctx.close();
+				    }
+				    
+				    @Override
+				    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+				            throws Exception {
+				        logger.error("Unexpected exception from downstream:"+cause.getMessage());
+				        ctx.close();
+				    }
+				}
+		);
 		return reulst;
 	}
 }

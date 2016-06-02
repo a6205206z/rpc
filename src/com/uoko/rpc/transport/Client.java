@@ -11,6 +11,7 @@ package com.uoko.rpc.transport;
 
 import org.apache.log4j.Logger;
 
+import com.uoko.rpc.handler.ProtocolProcessHandler;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -26,26 +27,20 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class Client {
+public class Client  {
 	private static final Logger logger = Logger.getLogger(Client.class);
 	private Bootstrap bootstrap;
 	private EventLoopGroup workerGroup;
-	private String host;
-	private int port;
 	
-	public Client(String host,int port){
+	public Client(){
 		workerGroup = new NioEventLoopGroup();
 		bootstrap = new Bootstrap();
 		bootstrap.group(workerGroup);
 		bootstrap.channel(NioSocketChannel.class); // (3)  
 		bootstrap.option(ChannelOption.SO_KEEPALIVE, true); // (4)  
-		
- 
-		this.host = host;
-		this.port = port;
 	}
 	
-	public void invoke(ChannelHandlerAdapter invokeMthodHandler){
+	public void invoke(String host,int port,ChannelHandlerAdapter invokeMthodHandler){
 		try {
 			bootstrap.handler(new ChannelInitializer<SocketChannel>() {  
 	            @Override  
@@ -53,8 +48,8 @@ public class Client {
 	            	ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this
 			                .getClass().getClassLoader()))); 
 	            	ch.pipeline().addLast(new ObjectEncoder());
-	                ch.pipeline().addLast(invokeMthodHandler);  
-	                
+	            	ch.pipeline().addLast(new ProtocolProcessHandler());
+	                ch.pipeline().addLast(invokeMthodHandler);
 	            }  
 	        });
 			
@@ -62,8 +57,12 @@ public class Client {
 			future.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
 			logger.equals(e);
-		} finally {
+		} 
+	}
+	
+	public void close(){
+		if(workerGroup!=null){
 			workerGroup.shutdownGracefully();
-        }
+		}
 	}
 }

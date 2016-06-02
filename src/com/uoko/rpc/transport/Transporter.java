@@ -11,7 +11,7 @@ package com.uoko.rpc.transport;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class Context implements Serializable {
+public class Transporter implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String transporterID;
@@ -20,7 +20,7 @@ public class Context implements Serializable {
 	private int statusCode;
 	private String exceptionBody;
 	
-	public Context(ServiceInfo service,MethodInfo method){
+	public Transporter(ServiceInfo service,MethodInfo method){
 		this.transporterID = UUID.randomUUID().toString();
 		this.service = service;
 		this.method = method;

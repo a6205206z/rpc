@@ -24,6 +24,9 @@ public class Invoker {
 		
 		Object result = null;
 		Method method = service.getClass().getMethod(methodName, parameterTypes);
+		for(int i = 0;i<parameterTypes.length;i++){
+			parameters[i]=parameterTypes[i].cast(parameters[i]);
+		}
 		result = method.invoke(service, parameters);
 		return result;
 	}

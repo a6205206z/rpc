@@ -92,7 +92,9 @@ implements ServiceDiscovery{
 	@Override
 	public void endDiscovery() {
 		try {
-			zookeeper.close();
+			if(zookeeper !=null){
+				zookeeper.close();
+			}
 		} catch (InterruptedException e) {
 			logger.error(e);
 		}

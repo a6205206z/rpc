@@ -14,13 +14,15 @@ import org.apache.log4j.Logger;
 
 import com.uoko.rpc.common.ServiceHelper;
 import com.uoko.rpc.provider.Invoker;
-import com.uoko.rpc.transport.Context;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.ServiceInfo;
+import com.uoko.rpc.transport.Transporter;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
 
+@Sharable
 public class ServerProcessHandler extends ChannelHandlerAdapter {
 	private ConcurrentHashMap<String,Invoker> serviceInvokers; 
 	
@@ -31,11 +33,11 @@ public class ServerProcessHandler extends ChannelHandlerAdapter {
 	private static final Logger logger = Logger.getLogger(ServerProcessHandler.class); 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
-		Context context = null;
+		Transporter transporter = null;
 		try{
-			context = (Context)msg;
-			ServiceInfo rpcService = context.getService(); 
-			MethodInfo rpcMethod = context.getMethod();
+			transporter = (Transporter)msg;
+			ServiceInfo rpcService = transporter.getService(); 
+			MethodInfo rpcMethod = transporter.getMethod();
 			
 			
 			Invoker invoker = 
@@ -46,14 +48,14 @@ public class ServerProcessHandler extends ChannelHandlerAdapter {
 					rpcMethod.getParameterTypes(), 
 					rpcMethod.getParameters()));
 			
-			context.setStatusCode(200);
+			transporter.setStatusCode(200);
 		}catch(Exception ex){
 			logger.error(ex);
-			context = new Context(null,null);
-			context.setStatusCode(500);
-			context.setExceptionBody(ex.getMessage());
+			transporter = new Transporter(null,null);
+			transporter.setStatusCode(500);
+			transporter.setExceptionBody(ex.getMessage());
 		}
-		ctx.write(context);
+		ctx.write(transporter);
 	}
 	
     @Override
