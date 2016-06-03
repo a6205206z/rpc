@@ -66,7 +66,7 @@ public class Exporter {
 		
 
 		if(serviceInvokers.get(ServiceHelper.generateServiceInvokersKey(interfaceClass.getName(), version)) == null){
-			Invoker invoker = new Invoker(service);
+			Invoker invoker = InvokerFactory.getInstance().create(service);
 			serviceInvokers.put(ServiceHelper.generateServiceInvokersKey(interfaceClass.getName(), version), invoker);
 			serviceRegistry.register(interfaceClass,version, String.format("%s:%d",address,port));
 		}
