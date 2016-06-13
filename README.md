@@ -96,13 +96,16 @@ public class RpcProvider {
 		HelloService helloService = new HelloServiceImpl();
 		UserService userService = new UserServiceImpl();
 		
-		//step 2. addservice in
-		Exporter.getInstance().AddService(HelloService.class,helloService, "1.0");
-		Exporter.getInstance().AddService(UserService.class, userService, "1.0");
+		//step 2. create expoter and select protocol
+		Exporter exporter = ExporterFactory.getInstance().create("127.0.0.1",8080,ProtocolOption.simple);
+		
+		//step 3. addservice in
+		exporter.AddService(HelloService.class,helloService, "1.0");
+		exporter.AddService(UserService.class, userService, "1.0");
 		
 		
-		//step 3. provide service
-		Exporter.getInstance().export();
+		//step 4. provide service
+		exporter.export();
 	}
 }
 ```
@@ -177,14 +180,6 @@ zookeeper注册中心
 			<value>10000</value>
 		</property>
     </bean>
-    <bean id="exporter" class="com.uoko.rpc.protocol.Exporter">
-	    <property name="address">
-			<value>192.168.99.1</value>
-		</property>
-		<property name="port">
-			<value>8080</value>
-		</property>
-    </bean> 
 </beans>  
 ```
 #####zookeeper服务发现配置实例  
