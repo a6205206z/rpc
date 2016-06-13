@@ -99,7 +99,7 @@ public class RpcProvider {
 		//step 2. create expoter and select protocol
 		Exporter exporter = ExporterFactory.getInstance().create("127.0.0.1",8080,ProtocolOption.simple);
 		
-		//step 3. addservice in
+		//step 3. add service in
 		exporter.AddService(HelloService.class,helloService, "1.0");
 		exporter.AddService(UserService.class, userService, "1.0");
 		
