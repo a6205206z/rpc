@@ -35,12 +35,14 @@ public class Client  {
 		bootstrap.handler(channelInitializer);
 	}
 	
-	public void invokeWaitforResult(String host,int port,Transporter msg){
+	public void invoke(String host,int port,Transporter msg){
 		try {
 			ChannelFuture future = bootstrap.connect(host,port).sync();
 			
 			future.channel().write(msg);
 			future.channel().flush();
+			
+			future.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
 			logger.equals(e);
 		} 

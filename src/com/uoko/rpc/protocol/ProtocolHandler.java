@@ -8,18 +8,17 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.ChannelHandler.Sharable;
 
 @Sharable
-public class ProtocolProcessHandler extends ChannelHandlerAdapter {
-	public ProtocolProcessHandler(){
+public abstract class ProtocolHandler extends ChannelHandlerAdapter {
+	public ProtocolHandler(){
 		
 	}
 	
-	//protected abstract void readBody();
-	//protected abstract void writeBody();
+	protected abstract Object packageProtocol(Object in);
+	protected abstract Object unpackageProtocol(Object in);
 	
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
-        ctx.write(msg, promise);
+        ctx.write(packageProtocol(msg), promise);
         ctx.flush();
     }
     
@@ -27,6 +26,6 @@ public class ProtocolProcessHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     	
-        ctx.fireChannelRead(msg);
+        ctx.fireChannelRead(unpackageProtocol(msg));
     }
 }

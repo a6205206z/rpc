@@ -95,8 +95,9 @@ public abstract class Invoker<T>{
 		rpcMethod.setParameterTypes(method.getParameterTypes());
 		rpcMethod.setParameters(arguments);
 		Transporter transporter = new Transporter(rpcService,rpcMethod);
-
-		client.invokeWaitforResult(host,port,transporter);
+		
+		
+		client.invoke(host,port,transporter);
 		
 		doneSignal.await(timeout, TimeUnit.MILLISECONDS);
 		
