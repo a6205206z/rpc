@@ -1,8 +1,8 @@
 package com.uoko.rpc.provider;
 
+import com.uoko.rpc.common.ProtocolOption;
 
 public class ExporterFactory {
-
 	
 	private static ExporterFactory instance;
 	
@@ -22,8 +22,17 @@ public class ExporterFactory {
 		return instance;
 	}
 	
-	public Exporter create(){
-		Exporter exporter = new HttpExporter("127.0.0.1",8080);
+	public Exporter create(String address,int port,ProtocolOption protocol){
+		Exporter exporter = null;
+		switch(protocol){
+			case simple:
+				exporter = new SimpleExporter(address,port);
+				break;
+		default:
+			exporter = new SimpleExporter(address,port);
+			break;
+		}
+		
 		return exporter;
 	}
 }

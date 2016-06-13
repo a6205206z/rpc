@@ -31,7 +31,7 @@ public class ServiceProxy<T> {
 	private ServiceProxy(final Class<T> interfaceClass,String version){
 		this.interfaceClass = interfaceClass;
 		this.router = new Router<T>(interfaceClass,version);
-		this.invoker = new HttpInvoker<T>(interfaceClass, version);
+		this.invoker = new SimpleInvoker<T>(interfaceClass, version);
 	}
 	
 	/*
