@@ -24,10 +24,11 @@ public class RpcConsumer {
 			PersonEnttiy person = null;
 			
 			person = new PersonEnttiy();
-			person.setName("Cean Cheng");
-			person.setSex("Male");
-			person.setAge(10);
 			for(int i=0;i<1000;i++){
+				person.setName("Cean Cheng " + i);
+				person.setSex("Male");
+				person.setAge(10);
+				
 				String result = helloService.hello(person);
 				
 				System.out.println(result);

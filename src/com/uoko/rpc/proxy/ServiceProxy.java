@@ -31,7 +31,7 @@ public class ServiceProxy<T> {
 	private ServiceProxy(final Class<T> interfaceClass,String version){
 		this.interfaceClass = interfaceClass;
 		this.router = new Router<T>(interfaceClass,version);
-		this.invoker = new Invoker<T>(interfaceClass, version);
+		this.invoker = new HttpInvoker<T>(interfaceClass, version);
 	}
 	
 	/*
@@ -71,8 +71,15 @@ public class ServiceProxy<T> {
 		return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[]{interfaceClass}, new InvocationHandler(){
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				Object result = null;
 				String address = router.getServiceAddress();
-				return invoker.invoke(method, args, address);
+				
+				try{
+					result = invoker.invoke(method, args, address,2000);
+				}catch(Exception e){
+					logger.error(e);
+				}
+				return result;
 			}
 		});
 	}

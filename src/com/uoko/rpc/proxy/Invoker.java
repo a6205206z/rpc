@@ -9,38 +9,66 @@
 package com.uoko.rpc.proxy;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.uoko.rpc.common.InvokeCallback;
+import com.uoko.rpc.handler.ClientInvokeHandler;
 import com.uoko.rpc.transport.Client;
-import com.uoko.rpc.transport.Transporter;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.ServiceInfo;
+import com.uoko.rpc.transport.Transporter;
 
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.ChannelInitializer;
 
-public class Invoker<T>{
+public abstract class Invoker<T>{
 	private static final Logger logger = Logger.getLogger(Invoker.class);
 	
 	private Class<T> interfaceClass;
 	private String version;
-	private Client client;
 	
-	private Object reulst = null;
+	private Client client;
+	private Object result = null;
+	private ClientInvokeHandler invokeHandler;
+	private CountDownLatch doneSignal;
+	
 	protected Invoker(final Class<T> interfaceClass,String version){
+		this.doneSignal = new CountDownLatch(1);
 		this.interfaceClass = interfaceClass;
 		this.version = version;
-		this.client = new Client();
+		this.invokeHandler = new ClientInvokeHandler(new InvokeCallback(){
+
+			@Override
+			public void callback(Object o) {
+				doneSignal.countDown();
+				result = o;
+			}
+			
+		});
+		
+		this.client = new Client(new ChannelInitializer<SocketChannel>(){
+
+			@Override
+			protected void initChannel(SocketChannel ch) throws Exception {
+				setPipeline(ch);
+		        ch.pipeline().addLast(invokeHandler);
+			}
+		});
 	}
+	
+	protected abstract void setPipeline(SocketChannel ch);
 	
 	protected void dispose(){
 		if(this.client != null){
 			this.client.close();
 		}
 	}
-
-	public Object invoke(Method method, Object[] arguments,String address)
+	
+	public Object invoke(Method method, Object[] arguments,String address,int timeout) 
+			throws InterruptedException
 	{
 		String host = address.split(":")[0];
 		int port = Integer.parseInt(address.split(":")[1]);
@@ -58,53 +86,20 @@ public class Invoker<T>{
 		
 		logger.debug("invoke on " + address);
 		
+		ServiceInfo rpcService = new ServiceInfo();
+		rpcService.setServiceName(interfaceClass.getName());
+		rpcService.setVersion(version);
 		
-		
-		client.invoke(host,port,
-				new ChannelHandlerAdapter(){
+		MethodInfo rpcMethod = new MethodInfo();
+		rpcMethod.setMethodName(method.getName());
+		rpcMethod.setParameterTypes(method.getParameterTypes());
+		rpcMethod.setParameters(arguments);
+		Transporter transporter = new Transporter(rpcService,rpcMethod);
 
-					@Override
-					public void channelActive(ChannelHandlerContext ctx) throws Exception{
-						ServiceInfo rpcService = new ServiceInfo();
-						rpcService.setServiceName(interfaceClass.getName());
-						rpcService.setVersion(version);
-						
-						MethodInfo rpcMethod = new MethodInfo();
-						rpcMethod.setMethodName(method.getName());
-						rpcMethod.setParameterTypes(method.getParameterTypes());
-						rpcMethod.setParameters(arguments);
-						Transporter transporter = new Transporter(rpcService,rpcMethod);
-						ctx.writeAndFlush(transporter);
-					}
-					
-					
-					@Override
-					public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
-						if(msg instanceof Transporter)
-						{
-							Transporter transporter = (Transporter)msg;
-							if(transporter.getStatusCode() == 200){
-								reulst = transporter.getMethod().getResult();
-							}else{
-								throw new Exception(transporter.getExceptionBody());
-							}
-						}
-					}
-					
-				    @Override
-				    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-				        ctx.flush();
-				        ctx.close();
-				    }
-				    
-				    @Override
-				    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-				            throws Exception {
-				        logger.error("Unexpected exception from downstream:"+cause.getMessage());
-				        ctx.close();
-				    }
-				}
-		);
-		return reulst;
+		client.invokeWaitforResult(host,port,transporter);
+		
+		doneSignal.await(timeout, TimeUnit.MILLISECONDS);
+		
+		return result;
 	}
 }

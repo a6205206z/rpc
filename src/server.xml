@@ -19,12 +19,4 @@
 			<value>10000</value>
 		</property>
     </bean>
-    <bean id="exporter" class="com.uoko.rpc.provider.Exporter">
-	    <property name="address">
-			<value>127.0.0.1</value>
-		</property>
-		<property name="port">
-			<value>8080</value>
-		</property>
-    </bean> 
 </beans>  

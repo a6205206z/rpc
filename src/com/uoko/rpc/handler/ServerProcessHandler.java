@@ -56,6 +56,7 @@ public class ServerProcessHandler extends ChannelHandlerAdapter {
 			transporter.setExceptionBody(ex.getMessage());
 		}
 		ctx.write(transporter);
+		ctx.flush();
 	}
 	
     @Override
