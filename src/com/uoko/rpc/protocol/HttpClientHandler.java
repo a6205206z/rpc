@@ -1,17 +1,18 @@
 package com.uoko.rpc.protocol;
 
+import com.uoko.rpc.transport.Transporter;
+
 public class HttpClientHandler extends ProtocolHandler {
 
 	@Override
-	protected Object packageProtocol(Object in) {
-		
+	protected Object packageProtocol(Transporter in) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Object unpackageProtocol(Object in) {
-
+	protected Transporter unpackageProtocol(Object in) {
+		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

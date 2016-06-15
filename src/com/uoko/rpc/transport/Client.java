@@ -41,7 +41,7 @@ public class Client  {
 			
 			future.channel().write(msg);
 			future.channel().flush();
-			
+
 			future.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
 			logger.equals(e);

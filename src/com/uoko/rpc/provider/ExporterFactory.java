@@ -28,6 +28,9 @@ public class ExporterFactory {
 			case simple:
 				exporter = new SimpleExporter(address,port);
 				break;
+			case http:
+				exporter = new HttpExporter(address,port);
+				break;
 		default:
 			exporter = new SimpleExporter(address,port);
 			break;

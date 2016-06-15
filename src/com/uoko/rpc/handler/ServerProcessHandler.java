@@ -20,6 +20,7 @@ import com.uoko.rpc.transport.Transporter;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 
 @Sharable
@@ -55,8 +56,7 @@ public class ServerProcessHandler extends ChannelHandlerAdapter {
 			transporter.setStatusCode(500);
 			transporter.setExceptionBody(ex.getMessage());
 		}
-		ctx.write(transporter);
-		ctx.flush();
+		ctx.writeAndFlush(transporter).addListener(ChannelFutureListener.CLOSE);
 	}
 	
     @Override

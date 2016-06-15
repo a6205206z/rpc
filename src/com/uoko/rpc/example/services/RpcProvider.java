@@ -21,7 +21,7 @@ public class RpcProvider {
 		UserService userService = new UserServiceImpl();
 		
 		//step 2. create expoter and select protocol
-		Exporter exporter = ExporterFactory.getInstance().create("127.0.0.1",8080,ProtocolOption.simple);
+		Exporter exporter = ExporterFactory.getInstance().create("127.0.0.1",8080,ProtocolOption.http);
 		
 		//step 3. add service in
 		exporter.AddService(HelloService.class,helloService, "1.0");

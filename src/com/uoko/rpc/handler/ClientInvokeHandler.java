@@ -15,6 +15,7 @@ import com.uoko.rpc.transport.Transporter;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 
 @Sharable
@@ -44,8 +45,7 @@ public class ClientInvokeHandler extends ChannelHandlerAdapter {
 	
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-        ctx.close();
+        ctx.writeAndFlush(ChannelFutureListener.CLOSE);
     }
     
     @Override
