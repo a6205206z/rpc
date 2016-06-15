@@ -99,7 +99,7 @@ public class RpcProvider {
 		//step 2. create expoter and select protocol
 		Exporter exporter = ExporterFactory.getInstance().create("127.0.0.1",8080,ProtocolOption.simple);
 		
-		//step 3. addservice in
+		//step 3. add service in
 		exporter.AddService(HelloService.class,helloService, "1.0");
 		exporter.AddService(UserService.class, userService, "1.0");
 		
@@ -215,4 +215,5 @@ zookeeper注册中心
 
 ###4. 支持TCP长连接(完成100%)
 
-###5. 多种协议选择(完成30%)
+###5. 多种协议选择(完成40%)
+####5.1 HTTP 协议支持(完成50%)
