@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import org.apache.log4j.Logger;
 
 import com.uoko.rpc.common.ServerInfo;
+import com.uoko.rpc.serialize.JsonSerialize;
 import com.uoko.rpc.transport.MethodInfo;
 import com.uoko.rpc.transport.ServiceInfo;
 import com.uoko.rpc.transport.Transporter;
@@ -29,6 +30,7 @@ import io.netty.handler.codec.http.HttpVersion;
 
 public class HttpServerHandler extends ProtocolHandler {
 	private static final Logger logger = Logger.getLogger(HttpServerHandler.class);
+	private final JsonSerialize<Transporter> js = new JsonSerialize<Transporter>();
 	@Override
 	protected Object packageProtocol(Transporter in) {
 
@@ -38,6 +40,7 @@ public class HttpServerHandler extends ProtocolHandler {
 			Transporter transporter = (Transporter)in;
 			if(transporter.getStatusCode() == 200){
 				response.setStatus(HttpResponseStatus.OK);
+				response.content().writableBytes();
 				 /*
 				  * 
 				  * 
@@ -45,7 +48,12 @@ public class HttpServerHandler extends ProtocolHandler {
 				  * 
 				  * 
 				  * */
-				
+				String json = js.serialize(transporter);
+				try {
+					response.content().writeBytes(json.getBytes("UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					logger.error(e);
+				}
 				
 			}else{
 				response.setStatus(HttpResponseStatus.BAD_REQUEST);
@@ -91,7 +99,7 @@ public class HttpServerHandler extends ProtocolHandler {
 				  * 
 				  * 
 				  * */
-				
+				transporter = js.deserialize(body);
 				
 			} catch (UnsupportedEncodingException e) {
 				logger.error(e);
