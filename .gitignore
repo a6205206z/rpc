@@ -1,6 +1,12 @@
+*.project
+*.settings
+*.classpath
 *.class
-*.apk
-bin/
-gen/
-.settings/
-proguard/
+target
+*.log
+*/log/*
+logs
+*.bak
+.idea
+*.idea*
+*.iml

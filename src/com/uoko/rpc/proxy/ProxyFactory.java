@@ -12,10 +12,11 @@ public class ProxyFactory {
 	
 	
 	private static ProxyFactory instance;
+	private ServiceProxyPool serviceProxyPool;
 	
 	
 	private ProxyFactory(){
-		
+		serviceProxyPool = new ServiceProxyPool();
 	}
 	/*
 	 * 
@@ -37,8 +38,11 @@ public class ProxyFactory {
 	 * 
 	 * 
 	 * */
-	public synchronized <T> ServiceProxy<T> createProxy(final Class<T> interfaceClass,String version) {
-		return ServiceProxy.getInstanceEachInterface(interfaceClass, version);
+	public <T> ServiceProxy<T> createProxy(final Class<T> interfaceClass,String version) {
+		return serviceProxyPool.getOrCreateServiceProxy(interfaceClass, version);
 	}
 
+	public void closeProxy(final Class interfaceClass,String version){
+		serviceProxyPool.closeServiceProxy(interfaceClass,version);
+	}
 }

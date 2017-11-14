@@ -24,7 +24,7 @@ public class RpcConsumer {
 			PersonEnttiy person = null;
 			
 			person = new PersonEnttiy();
-			for(int i=0;i<1000;i++){
+			for(int i=0;i<1;i++){
 				person.setName("Cean Cheng " + i);
 				person.setSex("Male");
 				person.setAge(10);
@@ -36,8 +36,10 @@ public class RpcConsumer {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			helloServiceProxy.close();
+			ProxyFactory.getInstance().closeProxy(HelloService.class,"1.0");
 		}
+
+
 		
 		
 		
@@ -51,7 +53,7 @@ public class RpcConsumer {
 			e.printStackTrace();
 		}
 		finally{
-			userServiceProxy.close();
+			ProxyFactory.getInstance().closeProxy(UserService.class,"1.0");
 		}
 	}
 }
