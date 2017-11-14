@@ -41,13 +41,10 @@ public class Router<T> {
 				//init serviceAddress
 				//discover service
 
-				serviceDiscovery.beginDiscovery(interfaceClass, version, new ServiceDiscoveryHandler(){
-					@Override
-					public void serviceChanged(List<String> addressList) {
-						serviceAddressList = addressList;
-						latch.countDown();
-					}
-				});
+				serviceDiscovery.beginDiscovery(interfaceClass, version, addressList -> {
+                    serviceAddressList = addressList;
+                    latch.countDown();
+                });
 				
 				
 				latch.await();

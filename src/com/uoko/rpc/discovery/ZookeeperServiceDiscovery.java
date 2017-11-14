@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
-import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
@@ -43,14 +42,11 @@ implements ServiceDiscovery{
 		ZooKeeper zk = null;
 		
 		try {
-			zk = new ZooKeeper(connectionString,sessionTimeout, new Watcher(){
-				@Override
-				public void process(WatchedEvent event) {
-					if(event.getState() == Event.KeeperState.SyncConnected){
-						latch.countDown();
-					}
-				}
-			});
+			zk = new ZooKeeper(connectionString,sessionTimeout, event -> {
+                if(event.getState() == Watcher.Event.KeeperState.SyncConnected){
+                    latch.countDown();
+                }
+            });
 			latch.await();
 		} catch (Exception e) {
 			logger.error(e);
@@ -61,14 +57,11 @@ implements ServiceDiscovery{
 	
 	private void WatchNode(ZooKeeper zk,String serviceAddressZKPath,ServiceDiscoveryHandler discoveryHandler){
 		try {
-			List<String> addressList = zk.getChildren(serviceAddressZKPath, new Watcher(){
-				@Override
-				public void process(WatchedEvent event) {
-					if(event.getType() == Event.EventType.NodeChildrenChanged){
-						WatchNode(zk,serviceAddressZKPath,discoveryHandler);
-					}
-				}
-			});
+			List<String> addressList = zk.getChildren(serviceAddressZKPath, event -> {
+                if(event.getType() == Watcher.Event.EventType.NodeChildrenChanged){
+                    WatchNode(zk,serviceAddressZKPath,discoveryHandler);
+                }
+            });
 
 			if(discoveryHandler != null){
 				discoveryHandler.serviceChanged(addressList);

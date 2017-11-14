@@ -43,7 +43,7 @@ public abstract class Exporter {
 	public Exporter(String address,int port){
 		this.address = address;
 		this.port = port;
-		this.serviceInvokers = new ConcurrentHashMap<String,Invoker>();
+		this.serviceInvokers = new ConcurrentHashMap<>();
 		this.serviceRegistry = ServiceRegistryFactory.getInstance().createServiceRegistry();
 	}
 
